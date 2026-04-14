@@ -1,0 +1,22 @@
+import { Router } from 'express'
+import { authMiddleware } from '../middleware/auth.middleware.js'
+
+const router = Router()
+
+router.get('/', authMiddleware, (_req, _res) => {
+  _res.json({ success: true, data: { data: [], pagination: { page: 1, limit: 20, total: 0, totalPages: 0 } } })
+})
+
+router.post('/', authMiddleware, (_req, _res) => {
+  _res.status(201).json({ success: true, data: null })
+})
+
+router.patch('/:id', authMiddleware, (_req, _res) => {
+  _res.json({ success: true, data: null })
+})
+
+router.delete('/:id', authMiddleware, (_req, _res) => {
+  _res.status(204).json()
+})
+
+export default router
