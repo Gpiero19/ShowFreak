@@ -66,4 +66,19 @@ migrations/ # Prisma migrations
 - Only generate code compatible with the stack and architecture defined here  
 - Do not hallucinate database fields, API endpoints, or external services not defined  
 - Always suggest improvements aligned with performance, maintainability, and scalability  
-- Provide code examples with type safety, clear naming, and proper documentation  
+
+
+## ATOMIC COMMIT ENFORCEMENT (MANDATORY)
+
+Every completed task MUST result in:
+1. A git commit in the correct worktree
+2. One commit per task (no batching multiple INF tasks)
+3. Commit must reference EXACT task ID
+
+Forbidden:
+- grouping multiple INF tasks in one commit
+- "initial scaffold" commits covering multiple tasks
+- runtime-only excuses without classification
+
+Allowed exception:
+- database creation (INF-03) → documented as runtime event in commit message
