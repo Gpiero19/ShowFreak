@@ -3,6 +3,11 @@ import { useAuth } from './context/AuthContext'
 import { Layout } from './components/Layout'
 import { LoginPage } from './pages/LoginPage'
 import { RegisterPage } from './pages/RegisterPage'
+import { HomePage } from './pages/HomePage'
+import { SearchPage } from './pages/SearchPage'
+import { LibraryPage } from './pages/LibraryPage'
+import { PreferencesPage } from './pages/PreferencesPage'
+import { DetailsPage } from './pages/DetailsPage'
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, isLoading } = useAuth()
@@ -26,10 +31,11 @@ function App() {
             <PrivateRoute>
               <Layout>
                 <Routes>
-                  <Route path="/" element={<div className="text-center">Home - Coming Soon</div>} />
-                  <Route path="/search" element={<div className="text-center">Search - Coming Soon</div>} />
-                  <Route path="/library" element={<div className="text-center">Library - Coming Soon</div>} />
-                  <Route path="/preferences" element={<div className="text-center">Preferences - Coming Soon</div>} />
+                  <Route path="/" element={<HomePage />} />
+                  <Route path="/search" element={<SearchPage />} />
+                  <Route path="/library" element={<LibraryPage />} />
+                  <Route path="/preferences" element={<PreferencesPage />} />
+                  <Route path="/details/:type/:id" element={<DetailsPage />} />
                 </Routes>
               </Layout>
             </PrivateRoute>
