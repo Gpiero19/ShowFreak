@@ -21,18 +21,19 @@ model User {
 }
 
 model ContentCache {
-  externalId   String   @id @map("external_id") @db.VarChar(50)
-  contentType String   @map("content_type") @db.VarChar(20)
+  externalId   String   @map("external_id") @db.VarChar(50)
+  contentType  String   @map("content_type") @db.VarChar(20)
   title        String   @db.VarChar(255)
   posterPath   String?  @map("poster_path") @db.VarChar(255)
   voteAverage  Decimal? @map("vote_average") @db.Decimal(3, 1)
-  releaseYear Int?     @map("release_year")
+  releaseYear  Int?     @map("release_year")
   genres       Json
   cachedAt     DateTime @default(now()) @map("cached_at") @db.Timestamptz
   expiresAt    DateTime @map("expires_at") @db.Timestamptz
 
   libraryItems LibraryItem[]
 
+  @@id([externalId, contentType], name: "pk_cache_external_content")
   @@index([contentType], name: "idx_content_type")
   @@index([title], name: "idx_title")
   @@index([genres], name: "idx_genres", type: Gin)
