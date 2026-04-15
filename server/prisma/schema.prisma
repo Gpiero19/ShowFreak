@@ -53,9 +53,9 @@ model LibraryItem {
   updatedAt      DateTime  @updatedAt @map("updated_at") @db.Timestamptz
 
   user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  contentCache ContentCache  @relation(fields: [externalId], references: [externalId])
+  contentCache ContentCache  @relation(fields: [externalId, contentType], references: [externalId, contentType])
 
-  @@unique([userId, externalId], name: "uq_library_user_content")
+  @@unique([userId, externalId, contentType], name: "uq_library_user_content")
   @@index([userId, status], name: "idx_library_user_status")
   @@index([userId, contentType], name: "idx_library_user_type")
   @@map("library_items")
