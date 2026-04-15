@@ -19,4 +19,13 @@ export const tmdbService = {
     const endpoint = '/search/' + contentType + '?query=' + encodeURIComponent(query)
     return this.fetchWithRetry(endpoint)
   },
+
+  async discoverRaw(contentType: string, options: { genre?: number; year?: number; sortBy?: string; page?: number } = {}): Promise<any[]> {
+    const { genre, year, sortBy = 'popularity.desc', page = 1 } = options
+    let endpoint = '/' + contentType + '/discover?sort_by=' + sortBy + '&page=' + page
+    if (genre) endpoint += '&with_genres=' + genre
+    if (year) endpoint += '&primary_release_year=' + year
+    const result: any = await this.fetchWithRetry(endpoint)
+    return result?.results || []
+  },
 }

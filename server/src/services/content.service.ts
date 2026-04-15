@@ -83,6 +83,12 @@ export const contentService = {
     return tmdbService.getDetailsRaw(externalId, contentType)
   },
 
+  async discover(contentType: string, options: { genre?: number; year?: number; sortBy?: string; page?: number } = {}): Promise<any[]> {
+    const { tmdbService } = await import('./tmdb.service.js')
+    const result = await tmdbService.discoverRaw(contentType, options)
+    return result
+  },
+
   async cacheContent(item: CachedContent): Promise<void> {
     const expiresAt = new Date()
     expiresAt.setDate(expiresAt.getDate() + 30)
