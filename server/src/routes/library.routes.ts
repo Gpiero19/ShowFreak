@@ -1,22 +1,12 @@
 import { Router } from 'express'
 import { authMiddleware } from '../middleware/auth.middleware.js'
+import { libraryController } from '../controllers/library.controller.js'
 
 const router = Router()
 
-router.get('/', authMiddleware, (_req, _res) => {
-  _res.json({ success: true, data: { data: [], pagination: { page: 1, limit: 20, total: 0, totalPages: 0 } } })
-})
-
-router.post('/', authMiddleware, (_req, _res) => {
-  _res.status(201).json({ success: true, data: null })
-})
-
-router.patch('/:id', authMiddleware, (_req, _res) => {
-  _res.json({ success: true, data: null })
-})
-
-router.delete('/:id', authMiddleware, (_req, _res) => {
-  _res.status(204).json()
-})
+router.get('/', authMiddleware, libraryController.getAll)
+router.post('/', authMiddleware, libraryController.create)
+router.patch('/:id', authMiddleware, libraryController.update)
+router.delete('/:id', authMiddleware, libraryController.delete)
 
 export default router
