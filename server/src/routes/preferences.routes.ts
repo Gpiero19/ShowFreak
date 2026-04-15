@@ -1,18 +1,11 @@
 import { Router } from 'express'
 import { authMiddleware } from '../middleware/auth.middleware.js'
+import { preferencesController } from '../controllers/preferences.controller.js'
 
 const router = Router()
 
-router.get('/', authMiddleware, (_req, _res) => {
-  _res.json({ success: true, data: [] })
-})
-
-router.post('/', authMiddleware, (_req, _res) => {
-  _res.status(201).json({ success: true, data: null })
-})
-
-router.delete('/:id', authMiddleware, (_req, _res) => {
-  _res.status(204).json()
-})
+router.get('/', authMiddleware, preferencesController.getAll)
+router.post('/', authMiddleware, preferencesController.create)
+router.delete('/:id', authMiddleware, preferencesController.delete)
 
 export default router
