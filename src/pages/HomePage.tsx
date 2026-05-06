@@ -15,9 +15,13 @@ export default function HomePage() {
           <p>Error loading recommendations</p>
         ) : (
           <div className="content-grid">
-            {data?.items.map((item) => (
-              <ContentCard key={item.externalId} content={item} />
-            ))}
+            {data?.items && data.items.length > 0 ? (
+              data.items.map((item) => (
+                <ContentCard key={item.externalId} content={item} />
+              ))
+            ) : (
+              <p>No recommendations available yet. Add content to your library to get personalized recommendations!</p>
+            )}
           </div>
         )}
       </section>
