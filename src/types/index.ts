@@ -27,6 +27,12 @@ export interface ApiResponse<T> {
   data?: T;
   error?: string;
   code?: string;
+  pagination?: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
 }
 
 export interface PaginatedResponse<T> {

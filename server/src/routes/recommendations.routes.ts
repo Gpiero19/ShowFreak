@@ -1,10 +1,9 @@
 import { Router } from 'express'
+import { recommendationController } from '../controllers/recommendation.controller.js'
 import { authMiddleware } from '../middleware/auth.middleware.js'
 
 const router = Router()
 
-router.get('/', authMiddleware, (_req, _res) => {
-  _res.json({ success: true, data: { items: [], basedOn: 'genre_preference' } })
-})
+router.get('/', authMiddleware, recommendationController.getRecommendations)
 
 export default router

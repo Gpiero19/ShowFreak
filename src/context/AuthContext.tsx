@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
-import { User, AuthResponse, LoginRequest, RegisterRequest } from '../types'
+import { User, LoginRequest, RegisterRequest } from '../types'
 import api from '../services/api'
 
 interface AuthContextType {
@@ -30,9 +30,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const login = async (data: LoginRequest) => {
-    const response = await api.post<AuthResponse>('/api/auth/login', data)
-    if (response.data.success && response.data.data) {
-      const { user, token } = response.data.data
+    const response = await api.post('/auth/login', data)
+    const responseData = response.data
+    if (responseData.success && responseData.data) {
+      const { user, token } = responseData.data
       setUser(user)
       setToken(token)
       localStorage.setItem('token', token)
@@ -41,9 +42,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   const register = async (data: RegisterRequest) => {
-    const response = await api.post<AuthResponse>('/api/auth/register', data)
-    if (response.data.success && response.data.data) {
-      const { user, token } = response.data.data
+    const response = await api.post('/auth/register', data)
+    const responseData = response.data
+    if (responseData.success && responseData.data) {
+      const { user, token } = responseData.data
       setUser(user)
       setToken(token)
       localStorage.setItem('token', token)

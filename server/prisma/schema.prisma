@@ -8,12 +8,11 @@ datasource db {
 }
 
 model User {
-  id           String    @id @default(uuid()) @db.Uuid
-  email        String    @unique @db.VarChar(255)
-  passwordHash String    @map("password_hash") @db.VarChar(255)
-  username     String    @db.VarChar(100)
-  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz
-
+  id              String           @id @default(uuid()) @db.Uuid
+  email           String           @unique @db.VarChar(255)
+  passwordHash    String           @map("password_hash") @db.VarChar(255)
+  username        String           @db.VarChar(100)
+  createdAt       DateTime         @default(now()) @map("created_at") @db.Timestamptz(6)
   libraryItems    LibraryItem[]
   userPreferences UserPreference[]
 
@@ -21,55 +20,53 @@ model User {
 }
 
 model ContentCache {
-  externalId   String   @id @map("external_id") @db.VarChar(50)
-  contentType String   @map("content_type") @db.VarChar(20)
-  title        String   @db.VarChar(255)
-  posterPath   String?  @map("poster_path") @db.VarChar(255)
-  voteAverage  Decimal? @map("vote_average") @db.Decimal(3, 1)
-  releaseYear Int?     @map("release_year")
-  genres       Json
-  cachedAt     DateTime @default(now()) @map("cached_at") @db.Timestamptz
-  expiresAt    DateTime @map("expires_at") @db.Timestamptz
+  externalId    String        @map("external_id") @db.VarChar(50)
+  contentType   String        @map("content_type") @db.VarChar(20)
+  title         String        @db.VarChar(255)
+  posterPath    String?       @map("poster_path") @db.VarChar(255)
+  voteAverage   Decimal?      @map("vote_average") @db.Decimal(3, 1)
+  releaseYear   Int?          @map("release_year")
+  genres        Json
+  cachedAt      DateTime      @default(now()) @map("cached_at") @db.Timestamptz(6)
+  expiresAt     DateTime      @map("expires_at") @db.Timestamptz(6)
+  library_items LibraryItem[]
 
-  libraryItems LibraryItem[]
-
-  @@index([contentType], name: "idx_content_type")
-  @@index([title], name: "idx_title")
-  @@index([genres], name: "idx_genres", type: Gin)
+  @@id([externalId, contentType])
+  @@index([contentType], map: "idx_content_type")
+  @@index([title], map: "idx_title")
+  @@index([genres], map: "idx_genres", type: Gin)
   @@map("content_cache")
 }
 
 model LibraryItem {
-  id             String    @id @default(uuid()) @db.Uuid
-  userId         String    @map("user_id") @db.Uuid
-  externalId     String    @map("external_id") @db.VarChar(50)
-  contentType    String    @map("content_type") @db.VarChar(20)
-  status         String    @db.VarChar(20)
-  personalRating Int?      @map("personal_rating")
-  notes          String?   @db.Text
-  watchedAt      DateTime? @map("watched_at") @db.Timestamptz
-  createdAt      DateTime  @default(now()) @map("created_at") @db.Timestamptz
-  updatedAt      DateTime  @updatedAt @map("updated_at") @db.Timestamptz
+  id             String       @id @default(uuid()) @db.Uuid
+  userId         String       @map("user_id") @db.Uuid
+  externalId     String       @map("external_id") @db.VarChar(50)
+  contentType    String       @map("content_type") @db.VarChar(20)
+  status         String       @db.VarChar(20)
+  personalRating Int?         @map("personal_rating")
+  notes          String?
+  watchedAt      DateTime?    @map("watched_at") @db.Timestamptz(6)
+  createdAt      DateTime     @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt      DateTime     @updatedAt @map("updated_at") @db.Timestamptz(6)
+  content_cache  ContentCache @relation(fields: [externalId, contentType], references: [externalId, contentType])
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  contentCache ContentCache  @relation(fields: [externalId], references: [externalId])
-
-  @@unique([userId, externalId], name: "uq_library_user_content")
-  @@index([userId, status], name: "idx_library_user_status")
-  @@index([userId, contentType], name: "idx_library_user_type")
+  @@unique([userId, externalId, contentType])
+  @@index([userId, status], map: "idx_library_user_status")
+  @@index([userId, contentType], map: "idx_library_user_type")
   @@map("library_items")
 }
 
 model UserPreference {
-  id            String    @id @default(uuid()) @db.Uuid
-  userId        String    @map("user_id") @db.Uuid
-  externalId    String    @map("external_id") @db.VarChar(50)
-  contentType   String    @map("content_type") @db.VarChar(20)
-  dislikeReason String?   @map("dislike_reason") @db.VarChar(50)
-  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  id            String   @id @default(uuid()) @db.Uuid
+  userId        String   @map("user_id") @db.Uuid
+  externalId    String   @map("external_id") @db.VarChar(50)
+  contentType   String   @map("content_type") @db.VarChar(20)
+  dislikeReason String?  @map("dislike_reason") @db.VarChar(50)
+  createdAt     DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId], name: "idx_preferences_user")
+  @@index([userId], map: "idx_preferences_user")
   @@map("user_preferences")
 }

@@ -1,4 +1,5 @@
 import dotenv from 'dotenv'
+import { StringValue } from 'ms'
 
 dotenv.config()
 
@@ -8,7 +9,7 @@ export const config = {
   },
   jwt: {
     secret: process.env.JWT_SECRET || 'your-super-secret-key-min-32-chars',
-    expiresIn: process.env.JWT_EXPIRES_IN || '7d',
+    expiresIn: (process.env.JWT_EXPIRES_IN || '7d') as StringValue,
   },
   tmdb: {
     apiKey: process.env.TMDB_API_KEY || '',

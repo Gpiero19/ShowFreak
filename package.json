@@ -14,7 +14,9 @@
     "build:frontend": "npm run build --workspace=src",
     "build:backend": "npm run build --workspace=server",
     "lint": "npm run lint --workspaces",
-    "typecheck": "npm run typecheck --workspaces"
+    "typecheck": "npm run typecheck --workspaces",
+    "clean:ports": "lsof -ti :3000,3001,5173,5174 | xargs -r kill -9",
+    "dev:clean": "npm run clean:ports && npm run dev"
   },
   "devDependencies": {
     "concurrently": "^8.2.2"

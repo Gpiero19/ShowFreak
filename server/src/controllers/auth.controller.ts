@@ -1,4 +1,4 @@
-import { Router, Request, Response } from 'express'
+import { Request, Response } from 'express'
 import { authService } from '../services/auth.service.js'
 import { config } from '../config/index.js'
 import jwt from 'jsonwebtoken'
@@ -7,7 +7,7 @@ export const authController = {
   async register(req: Request, res: Response) {
     try {
       const { email, password, username } = req.body
-      
+
       const existingUser = await authService.findUserByEmail(email)
       if (existingUser) {
         return res.status(400).json({
@@ -98,7 +98,26 @@ export const authController = {
 
   async me(req: Request, res: Response) {
     try {
-      const user = (req as any).user
+      const authReq = req as { user?: { id: string; email: string } }
+      const userId = authReq.user?.id
+
+      if (!userId) {
+        return res.status(401).json({
+          success: false,
+          error: 'User not found',
+          code: 'USER_NOT_FOUND',
+        })
+      }
+
+      const user = await authService.findUserById(userId)
+      if (!user) {
+        return res.status(404).json({
+          success: false,
+          error: 'User not found',
+          code: 'USER_NOT_FOUND',
+        })
+      }
+
       res.json({
         success: true,
         data: {
