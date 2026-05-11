@@ -90,3 +90,13 @@ Per specs.md, all MVP features are now implemented:
 
 ### Git Commits
 - 777ded8: fix: store genre IDs in content_cache and add recommendation fallback
+
+### Feature: Home Page Type Filter (FE-12)
+- Added toggle buttons to filter recommendations by content type (All/Movies/TV Shows)
+- Uses same toggle button styling as library page
+- Single-select behavior: selecting one deselects others
+- Client-side filtering of recommendation results
+- Default shows all recommendations
+
+### Git Commits
+- b8b3f8c: feat: add Movie/TV toggle filter to home page recommendations

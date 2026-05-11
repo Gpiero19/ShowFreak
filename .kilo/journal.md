@@ -125,3 +125,11 @@ All core functionality per specs.md is now implemented. Next steps:
 - New library items added after this fix will have proper genre IDs
 - Existing items with name-based genres may still yield empty personal recs until re-added
 - Trending fallback guarantees some recommendations even with empty/mismatched library
+
+### Home Page Filter Enhancement (FE-12)
+- Added Movie/TV toggle filter to recommendations section
+- Three-state button group: All (gray), Movies (purple), TV Shows (red)
+- Single-select behavior: only one content type filter at a time
+- Filtering applied client-side to recommendation results
+- Maintains consistency with library page filter UI
+- Commit: b8b3f8c
