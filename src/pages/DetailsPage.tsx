@@ -11,6 +11,7 @@ import {
 import { useLibraryMutations } from '../hooks/useLibraryMutations'
 import { usePreferenceMutations } from '../hooks/usePreferenceMutations'
 import { useLibraryItem } from '../hooks/useLibraryItem'
+import { usePreferences } from '../hooks/usePreferences'
 
 export default function DetailsPage() {
   const { id } = useParams()
@@ -37,14 +38,22 @@ export default function DetailsPage() {
   const { addToLibrary, updateLibraryItem, removeFromLibrary, isAdding, isUpdating, isDeleting } = useLibraryMutations()
   const { addDislike, removeDislike, isAdding: isAddingDislike, isRemoving: isRemovingDislike } = usePreferenceMutations()
 
+  // Fetch user's preferences to check if content is disliked
+  const { data: preferencesData } = usePreferences()
+
+  // Check if current content is disliked
+  const currentDislikedPreference = preferencesData?.data?.find(
+    (pref) => pref.externalId === id && pref.contentType === type
+  )
+
   // Local state for form
   const [status, setStatus] = useState<LibraryStatus>(LibraryStatus.WATCHED)
   const [rating, setRating] = useState<number>(0)
   const [notes, setNotes] = useState('')
   const [hoveredStar, setHoveredStar] = useState(0)
 
-   const content = contentData?.data
-   const libraryItem = libraryData?.data?.data?.[0]
+  const content = contentData?.data
+  const libraryItem = libraryData?.data?.data?.[0]
 
    // Reset form when library item changes
    useEffect(() => {
@@ -109,24 +118,22 @@ export default function DetailsPage() {
     }
   }
 
-  const handleRemoveDislike = async (prefId: string) => {
-    try {
-      await removeDislike(prefId)
-    } catch (error) {
-      console.error('Failed to remove dislike:', error)
-    }
-  }
+   const handleRemoveDislike = async () => {
+     if (!currentDislikedPreference) return
+     try {
+       await removeDislike(currentDislikedPreference.id)
+     } catch (error) {
+       console.error('Failed to remove dislike:', error)
+     }
+   }
 
-  // Check if content is disliked
-  const isDisliked = false // TODO: fetch from preferences API if needed
+   if (isLoadingContent) {
+     return <p>Loading...</p>
+   }
 
-  if (isLoadingContent) {
-    return <p>Loading...</p>
-  }
-
-  if (contentError || !content) {
-    return <p>Error loading content details</p>
-  }
+   if (contentError || !content) {
+     return <p>Error loading content details</p>
+   }
 
   return (
     <div className="details-page">
@@ -250,9 +257,9 @@ export default function DetailsPage() {
             {/* Dislike Section */}
             <div className="dislike-section">
               <h4>Don't recommend this?</h4>
-              {isDisliked ? (
+              {currentDislikedPreference ? (
                 <button 
-                  onClick={() => handleRemoveDislike('some-id')}
+                  onClick={handleRemoveDislike}
                   disabled={isRemovingDislike}
                   className="btn btn-secondary"
                 >
