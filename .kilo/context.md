@@ -21,3 +21,20 @@
 - Axios baseURL `/api` requires endpoint paths without leading `/api`
 - React Query invalidation after mutations critical for consistency
 - Use `useEffect` for syncing state from query results
+
+### Additional Completed (2026-05-11)
+- Library page filter UI enhanced with toggle buttons (FE-16)
+  * Status toggles: Watched (orange), Favorite (green), Wishlist (blue)
+  * Type toggles: Movies (purple), TV Shows (red)
+  * Inactive buttons are colorless; active buttons colored
+  * Multiple selections per category (OR logic)
+
+### Git Commits (additional)
+- 785c7d4: feat: replace library filter dropdowns with toggle buttons
+
+### Next Steps (updated)
+- Ensure API supports multiple status/type filters (currently single only)
+- Add toast notifications for filter changes (user feedback)
+- Write unit/integration tests for new toggle logic
+- Accessibility audit (button contrast, focus states)
+- Deploy to production

@@ -63,3 +63,14 @@ All core functionality per specs.md is now implemented. Next steps:
 - Polish UI with design system and accessibility improvements
 - Performance optimization (memoization, lazy loading)
 - Consider deployment setup
+
+## 2026-05-11 Continued
+
+### Library Page UI Enhancement (FE-16)
+- Replaced status and type dropdown selects with toggle button groups
+- Toggle buttons are colorless when inactive, colored when active:
+  - Status: Watched (orange), Favorite (green), Wishlist (blue)
+  - Type: Movies (purple), TV Shows (red)
+- Multiple selections per category supported (OR logic)
+- More visual and intuitive filter interface
+- Commit: 785c7d4
