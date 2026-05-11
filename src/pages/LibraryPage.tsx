@@ -4,16 +4,34 @@ import { LibraryStatus, ContentType, SortField, SortOrder } from '../types'
 import { ContentCard } from '../components/search/ContentCard'
 
 export default function LibraryPage() {
-  const [status, setStatus] = useState<LibraryStatus | ''>('')
-  const [type, setType] = useState<ContentType | ''>('')
+  const [activeStatuses, setActiveStatuses] = useState<LibraryStatus[]>([])
+  const [activeTypes, setActiveTypes] = useState<ContentType[]>([])
   const [genre, setGenre] = useState('')
   const [sort, setSort] = useState<SortField>(SortField.CREATED_AT)
   const [order, setOrder] = useState<SortOrder>(SortOrder.DESC)
   const [search, setSearch] = useState('')
 
+  // Toggle status filter
+  const toggleStatus = (status: LibraryStatus) => {
+    setActiveStatuses(prev =>
+      prev.includes(status)
+        ? prev.filter(s => s !== status)
+        : [...prev, status]
+    )
+  }
+
+  // Toggle type filter
+  const toggleType = (type: ContentType) => {
+    setActiveTypes(prev =>
+      prev.includes(type)
+        ? prev.filter(t => t !== type)
+        : [...prev, type]
+    )
+  }
+
   const libraryParams = {
-    status: status || undefined,
-    type: type || undefined,
+    status: activeStatuses.length > 0 ? activeStatuses[0] : undefined, // API expects single status for now
+    type: activeTypes.length > 0 ? activeTypes[0] : undefined, // API expects single type for now
     genre: genre || undefined,
     sort,
     order,
@@ -28,25 +46,49 @@ export default function LibraryPage() {
     <div className="library-page">
       <h1>My Library</h1>
       <div className="filters">
-        <select 
-          value={status} 
-          onChange={(e) => setStatus(e.target.value as LibraryStatus)}
-          className="filter-select"
-        >
-          <option value="">All Status</option>
-          <option value={LibraryStatus.WATCHED}>Watched</option>
-          <option value={LibraryStatus.FAVORITE}>Favorite</option>
-          <option value={LibraryStatus.WISHLIST}>Wishlist</option>
-        </select>
-        <select 
-          value={type} 
-          onChange={(e) => setType(e.target.value as ContentType)}
-          className="filter-select"
-        >
-          <option value="">All Types</option>
-          <option value={ContentType.MOVIE}>Movies</option>
-          <option value={ContentType.TV}>TV Shows</option>
-        </select>
+        {/* Status toggle buttons */}
+        <div className="toggle-group">
+          <button
+            type="button"
+            className={`toggle-btn ${activeStatuses.includes(LibraryStatus.WATCHED) ? 'active-watched' : ''}`}
+            onClick={() => toggleStatus(LibraryStatus.WATCHED)}
+          >
+            Watched
+          </button>
+          <button
+            type="button"
+            className={`toggle-btn ${activeStatuses.includes(LibraryStatus.FAVORITE) ? 'active-favorite' : ''}`}
+            onClick={() => toggleStatus(LibraryStatus.FAVORITE)}
+          >
+            Favorite
+          </button>
+          <button
+            type="button"
+            className={`toggle-btn ${activeStatuses.includes(LibraryStatus.WISHLIST) ? 'active-wishlist' : ''}`}
+            onClick={() => toggleStatus(LibraryStatus.WISHLIST)}
+          >
+            Wishlist
+          </button>
+        </div>
+
+        {/* Type toggle buttons */}
+        <div className="toggle-group">
+          <button
+            type="button"
+            className={`toggle-btn ${activeTypes.includes(ContentType.MOVIE) ? 'active-movie' : ''}`}
+            onClick={() => toggleType(ContentType.MOVIE)}
+          >
+            Movies
+          </button>
+          <button
+            type="button"
+            className={`toggle-btn ${activeTypes.includes(ContentType.TV) ? 'active-tv' : ''}`}
+            onClick={() => toggleType(ContentType.TV)}
+          >
+            TV Shows
+          </button>
+        </div>
+
         <input
           type="text"
           placeholder="Search by title..."
