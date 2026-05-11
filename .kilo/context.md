@@ -100,3 +100,13 @@ Per specs.md, all MVP features are now implemented:
 
 ### Git Commits
 - b8b3f8c: feat: add Movie/TV toggle filter to home page recommendations
+
+### Home Page Filter Simplified (FE-12)
+- Replaced All/Movies/TV three-button group with Movies/TV two-button toggle
+- No button selected → show all recommendations (default)
+- One button selected → filter to that content type
+- Buttons colored when active, colorless when inactive
+- Matches library page interaction pattern
+
+### Git Commits
+- 9a9d427: feat: simplify home page filter to Movies/TV only, remove All button

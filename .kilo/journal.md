@@ -133,3 +133,11 @@ All core functionality per specs.md is now implemented. Next steps:
 - Filtering applied client-side to recommendation results
 - Maintains consistency with library page filter UI
 - Commit: b8b3f8c
+
+### Home Page Filter Simplification (FE-12)
+- Removed "All" button; now only Movies and TV Shows toggle buttons
+- Behavior: no button selected = show all (default); clicking a button toggles it on (colored) or off (colorless)
+- Single-select per type category (radio behavior within Movies/TV)
+- Filter applied only when corresponding button is colored
+- Cleaner UI consistent with library page toggle pattern
+- Commit: 9a9d427
