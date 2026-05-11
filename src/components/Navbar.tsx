@@ -10,52 +10,48 @@ export default function Navbar() {
 
   return (
     <nav className={styles.navbar}>
-      <div className={styles.navbarContainer}>
-        <div className={styles.navbarMenu}>
+      <div className={styles.container}>
+        {/* Left side - Navigation links */}
+        <div className={styles.navLinks}>
           <Link 
             to="/" 
-            className={`${styles.navbarLink} ${isActive('/') ? styles.active : ''}`}
+            className={`${styles.navLink} ${isActive('/') ? styles.active : ''}`}
           >
             Home
           </Link>
           <Link 
             to="/search" 
-            className={`${styles.navbarLink} ${isActive('/search') ? styles.active : ''}`}
+            className={`${styles.navLink} ${isActive('/search') ? styles.active : ''}`}
           >
             Search
           </Link>
           <Link 
             to="/library" 
-            className={`${styles.navbarLink} ${isActive('/library') ? styles.active : ''}`}
+            className={`${styles.navLink} ${isActive('/library') ? styles.active : ''}`}
           >
             Library
           </Link>
           <Link 
             to="/preferences" 
-            className={`${styles.navbarLink} ${isActive('/preferences') ? styles.active : ''}`}
+            className={`${styles.navLink} ${isActive('/preferences') ? styles.active : ''}`}
           >
             Preferences
           </Link>
         </div>
-        
-        <div className={styles.navbarUser}>
-          {user ? (
-            <>
-              <span className={styles.navbarUserInfo}>
-                {user.username}
-              </span>
-              <button 
-                onClick={logout}
-                className={styles.navbarLogoutBtn}
-              >
-                Logout
-              </button>
-            </>
-          ) : (
-            <Link to="/auth" className={styles.navbarLoginLink}>
-              Login
-            </Link>
+
+        {/* Right side - User info and logout */}
+        <div className={styles.userSection}>
+          {user && (
+            <span className={styles.username}>
+              {user.username}
+            </span>
           )}
+          <button 
+            onClick={logout}
+            className={styles.logoutBtn}
+          >
+            Logout
+          </button>
         </div>
       </div>
     </nav>
