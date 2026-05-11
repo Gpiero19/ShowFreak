@@ -5,7 +5,12 @@ import { ContentType } from '../types'
 
 export default function HomePage() {
   const [activeType, setActiveType] = useState<ContentType | ''>('')
-  
+
+  // Toggle type filter (single-select, deselect if same clicked)
+  const toggleType = (type: ContentType) => {
+    setActiveType(prev => prev === type ? '' : type)
+  }
+
   const { data, isLoading, error } = useRecommendations(20)
 
   // Filter recommendations by type if a type is selected
@@ -20,26 +25,19 @@ export default function HomePage() {
       <section>
         <h2>Recommended for You</h2>
         
-        {/* Type toggle buttons */}
+        {/* Type toggle buttons - Movies and TV Shows only */}
         <div className="toggle-group" style={{ marginBottom: '1.5rem' }}>
           <button
             type="button"
-            className={`toggle-btn ${activeType === '' ? 'active-all' : ''}`}
-            onClick={() => setActiveType('')}
-          >
-            All
-          </button>
-          <button
-            type="button"
             className={`toggle-btn ${activeType === ContentType.MOVIE ? 'active-movie' : ''}`}
-            onClick={() => setActiveType(ContentType.MOVIE)}
+            onClick={() => toggleType(ContentType.MOVIE)}
           >
             Movies
           </button>
           <button
             type="button"
             className={`toggle-btn ${activeType === ContentType.TV ? 'active-tv' : ''}`}
-            onClick={() => setActiveType(ContentType.TV)}
+            onClick={() => toggleType(ContentType.TV)}
           >
             TV Shows
           </button>
@@ -56,7 +54,7 @@ export default function HomePage() {
                 <ContentCard key={item.externalId} content={item} />
               ))
             ) : (
-              <p>No recommendations available yet. Add content to your library to get personalized recommendations!</p>
+              <p>No recommendations available for this filter. Try a different selection or add more content to your library!</p>
             )}
           </div>
         )}
