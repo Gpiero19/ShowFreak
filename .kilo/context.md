@@ -44,3 +44,10 @@
 
 ### Git Commits (additional)
 - ecb7b6f: feat: make library status filters single-select (radio behavior)
+
+### Additional Completed (2026-05-11) - final
+- Library type filter now single-select (radio behavior): only Movies OR TV Shows active at a time, matching status filter
+- All filter toggle buttons now support exclusive selection per category
+
+### Git Commits (final)
+- 77dab3f: feat: make type filters (Movies/TV) single-select as well

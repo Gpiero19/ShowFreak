@@ -81,3 +81,10 @@ All core functionality per specs.md is now implemented. Next steps:
 - Type filters remain multi-select for flexible browsing
 - Matches original dropdown single-select semantics while keeping toggle UI
 - Commit: ecb7b6f
+
+### Library Page UI Finalization (FE-16)
+- Changed type filter to single-select (radio) to match status filter
+- Only Movies OR TV Shows can be selected, not both simultaneously
+- All filter buttons now have exclusive selection within their category
+- Consistent UI: one active status + one active type maximum
+- Commit: 77dab3f
