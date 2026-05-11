@@ -170,5 +170,5 @@ export interface Recommendation {
   voteAverage: number | null;
   releaseYear: number | null;
   genres: string[];
-  source: 'genre_preference' | 'watch_history' | 'similar_to';
+  source: 'genre_preference' | 'watch_history' | 'similar_to' | 'trending';
 }

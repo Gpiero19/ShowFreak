@@ -7,7 +7,7 @@ interface TMDBConfig {
 }
 
 class TMDBService {
-  private client: AxiosInstance
+  public client: AxiosInstance
   private imageBaseURL: string
 
   constructor(config: TMDBConfig) {
