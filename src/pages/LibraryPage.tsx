@@ -11,12 +11,10 @@ export default function LibraryPage() {
   const [order, setOrder] = useState<SortOrder>(SortOrder.DESC)
   const [search, setSearch] = useState('')
 
-  // Toggle status filter
+  // Toggle status filter (single selection only)
   const toggleStatus = (status: LibraryStatus) => {
     setActiveStatuses(prev =>
-      prev.includes(status)
-        ? prev.filter(s => s !== status)
-        : [...prev, status]
+      prev.includes(status) ? [] : [status]
     )
   }
 
