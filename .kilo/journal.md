@@ -141,3 +141,10 @@ All core functionality per specs.md is now implemented. Next steps:
 - Filter applied only when corresponding button is colored
 - Cleaner UI consistent with library page toggle pattern
 - Commit: 9a9d427
+
+### Navbar UI Polish (FE-09)
+- Confirmed spacing between navigation links: 2rem gap (adequate)
+- Added text-transform: capitalize to username for proper capitalization
+- Changed logout button hover effect: from generic opacity to red (#ef4444)
+- Provides clearer visual feedback on hover action
+- Commit: a66968c

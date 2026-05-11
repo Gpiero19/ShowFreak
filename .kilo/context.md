@@ -110,3 +110,11 @@ Per specs.md, all MVP features are now implemented:
 
 ### Git Commits
 - 9a9d427: feat: simplify home page filter to Movies/TV only, remove All button
+
+### UI Polish - Navbar (FE-09)
+- Username now displays with capitalized first letter
+- Logout button hover changes to red for clearer action feedback
+- Spacing between nav links already at 2rem (good)
+
+### Git Commits
+- a66968c: style: improve navbar UI with better spacing, capitalized username, and red logout hover
