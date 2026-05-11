@@ -18,7 +18,7 @@ export function useLibrary(params: LibraryQueryParams = {}) {
       if (params.type) queryParams.append('type', params.type)
 
       const queryString = queryParams.toString()
-      const url = `/api/library${queryString ? `?${queryString}` : ''}`
+      const url = `/library${queryString ? `?${queryString}` : ''}`
 
       const response = await api.get<ApiResponse<PaginatedResponse<LibraryItem>>>(url)
       return response.data

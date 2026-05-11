@@ -13,6 +13,7 @@ export function usePreferences() {
       return response.data
     },
     retry: 1,
+    staleTime: 5 * 60 * 1000, // 5 minutes
   })
 
   // Mutation to add a preference (dislike)
