@@ -1,55 +1,276 @@
+import { useState, useEffect } from 'react'
 import { useParams, useSearchParams } from 'react-router-dom'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { LibraryStatus } from '../types'
 import api from '../services/api'
-import { ApiResponse, ContentDetails } from '../types'
+import { 
+  ApiResponse, 
+  ContentDetails, 
+  LibraryItem 
+} from '../types'
+import { useLibraryMutations } from '../hooks/useLibraryMutations'
+import { usePreferenceMutations } from '../hooks/usePreferenceMutations'
+import { useLibraryItem } from '../hooks/useLibraryItem'
 
 export default function DetailsPage() {
   const { id } = useParams()
   const [searchParams] = useSearchParams()
   const type = searchParams.get('type') as 'movie' | 'tv' || 'movie'
-
-  const { data, isLoading, error } = useQuery<ApiResponse<ContentDetails>>({
+  
+  const queryClient = useQueryClient()
+  
+  // Fetch content details
+  const { data: contentData, isLoading: isLoadingContent, error: contentError } = useQuery<ApiResponse<ContentDetails>>({
     queryKey: ['content', id, type],
     queryFn: async () => {
       const response = await api.get<ApiResponse<ContentDetails>>(`/content/${id}?type=${type}`)
       return response.data
     },
     retry: 1,
+    enabled: !!id,
   })
+
+  // Fetch user's library item for this content (if exists)
+  const { data: libraryData, refetch: refetchLibrary } = useLibraryItem(id || '')
+
+  // Mutations
+  const { addToLibrary, updateLibraryItem, removeFromLibrary, isAdding, isUpdating, isDeleting } = useLibraryMutations()
+  const { addDislike, removeDislike, isAdding: isAddingDislike, isRemoving: isRemovingDislike } = usePreferenceMutations()
+
+  // Local state for form
+  const [status, setStatus] = useState<LibraryStatus>(LibraryStatus.WATCHED)
+  const [rating, setRating] = useState<number>(0)
+  const [notes, setNotes] = useState('')
+  const [hoveredStar, setHoveredStar] = useState(0)
+
+   const content = contentData?.data
+   const libraryItem = libraryData?.data?.data?.[0]
+
+   // Reset form when library item changes
+   useEffect(() => {
+     if (libraryItem) {
+       setStatus(libraryItem.status)
+       setRating(libraryItem.personalRating || 0)
+       setNotes(libraryItem.notes || '')
+     }
+   }, [libraryItem])
+
+   const handleAddToLibrary = async () => {
+    if (!id || !content) return
+    try {
+      await addToLibrary({
+        externalId: id,
+        contentType: type,
+        status,
+      })
+      await refetchLibrary()
+    } catch (error) {
+      console.error('Failed to add to library:', error)
+    }
+  }
+
+  const handleUpdateLibrary = async () => {
+    if (!libraryItem) return
+    try {
+      await updateLibraryItem({
+        id: libraryItem.id,
+        status,
+        personalRating: rating > 0 ? rating : null,
+        notes: notes || null,
+      })
+      await refetchLibrary()
+    } catch (error) {
+      console.error('Failed to update library item:', error)
+    }
+  }
+
+  const handleRemoveFromLibrary = async () => {
+    if (!libraryItem) return
+    try {
+      await removeFromLibrary(libraryItem.id)
+      await refetchLibrary()
+      setStatus(LibraryStatus.WATCHED)
+      setRating(0)
+      setNotes('')
+    } catch (error) {
+      console.error('Failed to remove from library:', error)
+    }
+  }
+
+  const handleAddDislike = async () => {
+    if (!id) return
+    try {
+      await addDislike({
+        externalId: id,
+        contentType: type,
+      })
+    } catch (error) {
+      console.error('Failed to add dislike:', error)
+    }
+  }
+
+  const handleRemoveDislike = async (prefId: string) => {
+    try {
+      await removeDislike(prefId)
+    } catch (error) {
+      console.error('Failed to remove dislike:', error)
+    }
+  }
+
+  // Check if content is disliked
+  const isDisliked = false // TODO: fetch from preferences API if needed
+
+  if (isLoadingContent) {
+    return <p>Loading...</p>
+  }
+
+  if (contentError || !content) {
+    return <p>Error loading content details</p>
+  }
 
   return (
     <div className="details-page">
-      {isLoading ? (
-        <p>Loading...</p>
-      ) : error ? (
-        <p>Error loading content details</p>
-      ) : data?.data ? (
-        <>
-          <h1>{data.data.title}</h1>
-          <div className="details-content">
-            {data.data.posterPath && (
-              <img
-                src={`https://image.tmdb.org/t/p/w500${data.data.posterPath}`}
-                alt={data.data.title}
-                className="details-poster"
-              />
+      <div className="details-content">
+        {content.posterPath && (
+          <img
+            src={`https://image.tmdb.org/t/p/w500${content.posterPath}`}
+            alt={content.title}
+            className="details-poster"
+          />
+        )}
+        <div className="details-info">
+          <h1>{content.title}</h1>
+          <p className="details-release">
+            {(content.releaseYear || 'N/A')} • {content.contentType.toUpperCase()}
+          </p>
+          {content.voteAverage && (
+            <p className="details-rating">★ {content.voteAverage.toFixed(1)}</p>
+          )}
+          <p className="details-overview">
+            {content.overview || 'No overview available.'}
+          </p>
+          {content.genres && content.genres.length > 0 && (
+            <p className="details-genres">
+              <strong>Genres:</strong> {content.genres.join(', ')}
+            </p>
+          )}
+
+          {/* Library Actions */}
+          <div className="details-actions">
+            <h3>My Library</h3>
+            
+            {libraryItem ? (
+              <div className="library-item-edit">
+                <div className="form-group">
+                  <label>Status:</label>
+                  <select 
+                    value={status} 
+                    onChange={(e) => setStatus(e.target.value as LibraryStatus)}
+                    disabled={isUpdating}
+                  >
+                    <option value={LibraryStatus.WATCHED}>Watched</option>
+                    <option value={LibraryStatus.FAVORITE}>Favorite</option>
+                    <option value={LibraryStatus.WISHLIST}>Wishlist</option>
+                  </select>
+                </div>
+
+                <div className="form-group">
+                  <label>My Rating:</label>
+                  <div className="star-rating">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <button
+                        key={star}
+                        type="button"
+                        className={`star ${star <= (hoveredStar || rating) ? 'filled' : ''}`}
+                        onClick={() => setRating(star)}
+                        onMouseEnter={() => setHoveredStar(star)}
+                        onMouseLeave={() => setHoveredStar(0)}
+                      >
+                        ★
+                      </button>
+                    ))}
+                    <span className="rating-value">
+                      {rating > 0 ? `${rating}/5` : 'Not rated'}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label>Notes:</label>
+                  <textarea
+                    value={notes}
+                    onChange={(e) => setNotes(e.target.value)}
+                    placeholder="Add notes..."
+                    rows={3}
+                    disabled={isUpdating}
+                  />
+                </div>
+
+                <div className="button-group">
+                  <button 
+                    onClick={handleUpdateLibrary}
+                    disabled={isUpdating}
+                    className="btn btn-primary"
+                  >
+                    {isUpdating ? 'Updating...' : 'Update Library'}
+                  </button>
+                  <button 
+                    onClick={handleRemoveFromLibrary}
+                    disabled={isDeleting}
+                    className="btn btn-danger"
+                  >
+                    {isDeleting ? 'Removing...' : 'Remove from Library'}
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="library-item-add">
+                <div className="form-group">
+                  <label>Add to Library:</label>
+                  <select 
+                    value={status} 
+                    onChange={(e) => setStatus(e.target.value as LibraryStatus)}
+                    disabled={isAdding}
+                  >
+                    <option value={LibraryStatus.WATCHED}>Watched</option>
+                    <option value={LibraryStatus.FAVORITE}>Favorite</option>
+                    <option value={LibraryStatus.WISHLIST}>Wishlist</option>
+                  </select>
+                </div>
+                <button 
+                  onClick={handleAddToLibrary}
+                  disabled={isAdding}
+                  className="btn btn-primary"
+                >
+                  {isAdding ? 'Adding...' : 'Add to Library'}
+                </button>
+              </div>
             )}
-            <div className="details-info">
-              <h2>{data.data.title}</h2>
-              <p className="details-release">{(data.data.releaseYear || 'N/A')} • {data.data.contentType.toUpperCase()}</p>
-              {data.data.voteAverage && <p className="details-rating">★ {data.data.voteAverage.toFixed(1)}</p>}
-              <p className="details-overview">{data.data.overview || 'No overview available.'}</p>
-              {data.data.genres && data.data.genres.length > 0 && (
-                <p className="details-genres">
-                  <strong>Genres:</strong> {data.data.genres.join(', ')}
-                </p>
+
+            {/* Dislike Section */}
+            <div className="dislike-section">
+              <h4>Don't recommend this?</h4>
+              {isDisliked ? (
+                <button 
+                  onClick={() => handleRemoveDislike('some-id')}
+                  disabled={isRemovingDislike}
+                  className="btn btn-secondary"
+                >
+                  {isRemovingDislike ? 'Removing...' : 'Remove from Dislikes'}
+                </button>
+              ) : (
+                <button 
+                  onClick={handleAddDislike}
+                  disabled={isAddingDislike}
+                  className="btn btn-secondary"
+                >
+                  {isAddingDislike ? 'Adding...' : 'Add to Dislikes'}
+                </button>
               )}
             </div>
           </div>
-        </>
-      ) : (
-        <p>Content not found</p>
-      )}
+        </div>
+      </div>
     </div>
   )
 }
