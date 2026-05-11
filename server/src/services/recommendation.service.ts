@@ -134,6 +134,16 @@ export const recommendationService = {
     filtered.sort((a, b) => (b.vote_average || 0) - (a.vote_average || 0))
     const finalResults = filtered.slice(0, limit)
 
+    // Fallback to trending if no recommendations match criteria
+    if (finalResults.length === 0) {
+      const trending = await this.getTrendingRecommendations(limit)
+      return {
+        items: trending.items,
+        basedOn: 'trending_fallback',
+        pagination: trending.pagination,
+      }
+    }
+
     const items: RecommendationItem[] = finalResults.map((item: any) => ({
       externalId: item.id.toString(),
       contentType: item.media_type === 'tv' ? 'tv' : 'movie',

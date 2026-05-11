@@ -148,69 +148,70 @@ export const contentController = {
         process.env.TMDB_IMAGE_BASE
       )
 
-      // Get details from TMDB
-      const data = await (contentType === 'movie'
-        ? tmdb.getMovieDetails(id)
-        : tmdb.getTVShowDetails(id)
-      )
+       // Get details from TMDB
+       const data = await (contentType === 'movie'
+         ? tmdb.getMovieDetails(id)
+         : tmdb.getTVShowDetails(id)
+       )
 
-      // Extract genres
-      const genres = data.genres?.map((g: any) => g.name) || []
+       // Extract genre IDs for caching and names for frontend response
+       const genreIds = data.genres?.map((g: any) => g.id) || []
+       const genreNames = data.genres?.map((g: any) => g.name) || []
 
-      // Cache/update content_cache using composite key
-      await prisma.contentCache.upsert({
-        where: {
-          externalId_contentType: {
-            externalId: id,
-            contentType,
-          },
-        },
-        update: {
-          contentType,
-          title: data.title || data.name,
-          posterPath: data.poster_path,
-          voteAverage: data.vote_average,
-          releaseYear: (data.release_date || data.first_air_date)?.split('-')[0] 
-            ? parseInt((data.release_date || data.first_air_date)?.split('-')[0]!)
-            : null,
-          genres,
-          cachedAt: new Date(),
-          expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
-        },
-        create: {
-          externalId: id,
-          contentType,
-          title: data.title || data.name,
-          posterPath: data.poster_path,
-          voteAverage: data.vote_average,
-          releaseYear: (data.release_date || data.first_air_date)?.split('-')[0] 
-            ? parseInt((data.release_date || data.first_air_date)?.split('-')[0]!)
-            : null,
-          genres,
-          cachedAt: new Date(),
-          expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
-        },
-      })
+       // Cache/update content_cache using composite key (store genre IDs)
+       await prisma.contentCache.upsert({
+         where: {
+           externalId_contentType: {
+             externalId: id,
+             contentType,
+           },
+         },
+         update: {
+           contentType,
+           title: data.title || data.name,
+           posterPath: data.poster_path,
+           voteAverage: data.vote_average,
+           releaseYear: (data.release_date || data.first_air_date)?.split('-')[0] 
+             ? parseInt((data.release_date || data.first_air_date)?.split('-')[0]!)
+             : null,
+           genres: genreIds,
+           cachedAt: new Date(),
+           expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
+         },
+         create: {
+           externalId: id,
+           contentType,
+           title: data.title || data.name,
+           posterPath: data.poster_path,
+           voteAverage: data.vote_average,
+           releaseYear: (data.release_date || data.first_air_date)?.split('-')[0] 
+             ? parseInt((data.release_date || data.first_air_date)?.split('-')[0]!)
+             : null,
+           genres: genreIds,
+           cachedAt: new Date(),
+           expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
+         },
+       })
 
-      const details = {
-        externalId: id,
-        contentType,
-        title: data.title || data.name,
-        posterPath: data.poster_path,
-        voteAverage: data.vote_average,
-        releaseYear: (data.release_date || data.first_air_date)?.split('-')[0] 
-          ? parseInt((data.release_date || data.first_air_date)?.split('-')[0]!)
-          : null,
-        genres,
-        overview: data.overview || '',
-        tagline: data.tagline,
-        runtime: data.runtime || data.episode_run_time?.[0] || null,
-        status: data.status || '',
-        voteCount: data.vote_count,
-        popularity: data.popularity,
-        backdropPath: data.backdrop_path,
-        originalLanguage: data.original_language || '',
-      }
+       const details = {
+         externalId: id,
+         contentType,
+         title: data.title || data.name,
+         posterPath: data.poster_path,
+         voteAverage: data.vote_average,
+         releaseYear: (data.release_date || data.first_air_date)?.split('-')[0] 
+           ? parseInt((data.release_date || data.first_air_date)?.split('-')[0]!)
+           : null,
+         genres: genreNames,
+         overview: data.overview || '',
+         tagline: data.tagline,
+         runtime: data.runtime || data.episode_run_time?.[0] || null,
+         status: data.status || '',
+         voteCount: data.vote_count,
+         popularity: data.popularity,
+         backdropPath: data.backdrop_path,
+         originalLanguage: data.original_language || '',
+       }
 
       return res.json({
         success: true,
