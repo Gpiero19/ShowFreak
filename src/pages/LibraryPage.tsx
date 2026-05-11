@@ -18,12 +18,10 @@ export default function LibraryPage() {
     )
   }
 
-  // Toggle type filter
+  // Toggle type filter (single selection only)
   const toggleType = (type: ContentType) => {
     setActiveTypes(prev =>
-      prev.includes(type)
-        ? prev.filter(t => t !== type)
-        : [...prev, type]
+      prev.includes(type) ? [] : [type]
     )
   }
 
