@@ -38,3 +38,9 @@
 - Write unit/integration tests for new toggle logic
 - Accessibility audit (button contrast, focus states)
 - Deploy to production
+
+### Additional Completed (2026-05-11) - continued
+- Library status filter now single-select (radio behavior): only one of Watched/Favorite/Wishlist active at a time
+
+### Git Commits (additional)
+- ecb7b6f: feat: make library status filters single-select (radio behavior)

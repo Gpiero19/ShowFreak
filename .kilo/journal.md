@@ -74,3 +74,10 @@ All core functionality per specs.md is now implemented. Next steps:
 - Multiple selections per category supported (OR logic)
 - More visual and intuitive filter interface
 - Commit: 785c7d4
+
+### Library Page UI Refinement (FE-16)
+- Changed status filter buttons to single-select (radio) behavior
+- Only one status (Watched, Favorite, Wishlist) can be active at a time
+- Type filters remain multi-select for flexible browsing
+- Matches original dropdown single-select semantics while keeping toggle UI
+- Commit: ecb7b6f
