@@ -51,3 +51,28 @@
 
 ### Git Commits (final)
 - 77dab3f: feat: make type filters (Movies/TV) single-select as well
+
+### Major Completion - Recommendation System (REC-03, REC-04)
+- Implemented full recommendation algorithm server-side:
+  * **Genre preference**: Weights genres from watched items by personal rating (5★=3, 4★=2, 3★=1, unrated=0.5), selects top 3, queries TMDB discover
+  * **Similar-to**: Returns TMDB similar items for a specific content ID
+  * **Trending fallback**: Shows TMDB weekly trending when user has empty library
+- Filters out disliked and already-in-library items
+- Sorts by vote_average (≥6) for quality
+- Recommendation type expanded to include `trending`
+- Home page now displays real personalized recommendations
+
+### All Core Features Complete
+Per specs.md, all MVP features are now implemented:
+- Browse & Search ✓
+- Personal Library (watched, favorites, wishlist) ✓
+- Library Management (filter, sort, search) ✓
+- Preferences (dislikes) ✓
+- Recommendations (genre-based, similar, trending) ✓
+
+### Next Steps
+- Add notifications/toasts for user actions
+- Write comprehensive tests (unit + integration)
+- Accessibility audit
+- Performance optimization
+- Deploy to production

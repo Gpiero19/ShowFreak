@@ -88,3 +88,26 @@ All core functionality per specs.md is now implemented. Next steps:
 - All filter buttons now have exclusive selection within their category
 - Consistent UI: one active status + one active type maximum
 - Commit: 77dab3f
+
+### Recommendation System Implementation (REC-03, REC-04)
+- Implemented full recommendation algorithm in `recommendationService`:
+  * **Genre-based**: Weights user's watched genres by personal rating (5★=3pts, 4★=2pts, 3★=1pt, unrated=0.5pt), takes top 3, queries TMDB discover
+  * **Similar-to**: Fetches similar content from TMDB for a given item ID
+  * **Trending fallback**: Returns TMDB trending when user has no library
+- Excludes disliked content and items already in library
+- Prefers content type (movie/tv) based on user's watch history
+- Sorts by vote_average (min 6) for quality
+- Controller now returns real data instead of stubs
+- Updated Recommendation type to include `trending` source
+- Made TMDBService.client public for service access
+- Commit: f0f0c1d
+
+### GitHub Commits (summary)
+- f0f0c1d: REC-03, REC-04: implement full recommendation algorithm
+- 8616666: docs: update journal and context with single-select type filter change
+- 77dab3f: feat: make type filters (Movies/TV) single-select as well
+- 785c7d4: feat: replace library filter dropdowns with toggle buttons
+- e3da63c: feat: enhance details page with library management and dislike functionality
+- b3fb6b7: feat: implement TMDB integration for content search and details
+- bf80909: fix: correct library API endpoint URL and improve hook configuration
+- f7c5d41: feat: implement main pages and navbar
