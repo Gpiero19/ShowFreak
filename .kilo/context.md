@@ -76,3 +76,17 @@ Per specs.md, all MVP features are now implemented:
 - Accessibility audit
 - Performance optimization
 - Deploy to production
+
+### Bugfix (2026-05-11)
+- Fixed empty recommendations on home page:
+  * **Root cause**: Details endpoint cached genre names instead of IDs; recommendation algorithm requires IDs for TMDB discover
+  * **Fix**: Cache genre IDs (from `g.id`) now; return genre names separately for frontend
+  * **Added fallback**: If personalized recs empty, return trending to ensure UI always shows content
+  * Result: Home page now displays real recommendations based on library or trending
+
+### Files Modified
+- server/src/controllers/content.controller.ts (details endpoint caching)
+- server/src/services/recommendation.service.ts (fallback logic)
+
+### Git Commits
+- 777ded8: fix: store genre IDs in content_cache and add recommendation fallback

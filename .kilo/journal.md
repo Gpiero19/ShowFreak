@@ -111,3 +111,17 @@ All core functionality per specs.md is now implemented. Next steps:
 - b3fb6b7: feat: implement TMDB integration for content search and details
 - bf80909: fix: correct library API endpoint URL and improve hook configuration
 - f7c5d41: feat: implement main pages and navbar
+
+### Bug Fix: Recommendations Not Showing (REC-03 follow-up)
+**Problem**: Home page displayed empty recommendations even though user had library items.
+**Root Cause**: Content details endpoint cached genre **names** instead of genre **IDs**. Recommendation algorithm uses genre IDs to query TMDB discover; passing names resulted in no matches.
+**Fix**:
+- Modified `content.controller.getDetails` to store `genreIds` (from `g.id`) in `content_cache.genres` while returning `genreNames` (from `g.name`) to frontend
+- Added fallback: if genre-based filtering yields zero results, automatically fall back to trending recommendations
+- Ensures home page always displays content (personalized or trending)
+- Commit: 777ded8
+
+### Additional Notes
+- New library items added after this fix will have proper genre IDs
+- Existing items with name-based genres may still yield empty personal recs until re-added
+- Trending fallback guarantees some recommendations even with empty/mismatched library
