@@ -138,16 +138,16 @@ body {
   border-color: #9333ea;
 }
 
-/* Active TV Show - Red */
-.toggle-btn.active-tv {
-  background-color: #ef4444;
-  border-color: #ef4444;
+/* Active All - Gray */
+.toggle-btn.active-all {
+  background-color: #6b7280;
+  border-color: #6b7280;
   color: white;
 }
 
-.toggle-btn.active-tv:hover {
-  background-color: #dc2626;
-  border-color: #dc2626;
+.toggle-btn.active-all:hover {
+  background-color: #4b5563;
+  border-color: #4b5563;
 }
 
 .auth-page form {
