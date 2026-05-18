@@ -4,7 +4,6 @@ import HomePage from './pages/HomePage'
 import SearchPage from './pages/SearchPage'
 import DetailsPage from './pages/DetailsPage'
 import LibraryPage from './pages/LibraryPage'
-import PreferencesPage from './pages/PreferencesPage'
 import AuthPage from './pages/AuthPage'
 import Navbar from './components/Navbar'
 
@@ -50,14 +49,6 @@ function App() {
           element={
             <PrivateRoute>
               <LibraryPage />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/preferences"
-          element={
-            <PrivateRoute>
-              <PreferencesPage />
             </PrivateRoute>
           }
         />

@@ -5,7 +5,6 @@ import { ApiResponse, UserPreference, CreatePreferenceDto } from '../types'
 export function usePreferences() {
   const queryClient = useQueryClient()
 
-  // Fetch user preferences
   const { data, isLoading, error } = useQuery<ApiResponse<UserPreference[]>>({
     queryKey: ['preferences'],
     queryFn: async () => {
@@ -13,19 +12,17 @@ export function usePreferences() {
       return response.data
     },
     retry: 1,
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 5 * 60 * 1000,
   })
 
-  // Mutation to add a preference (dislike)
   const addPreference = useMutation({
     mutationFn: (dto: CreatePreferenceDto) => 
       api.post<ApiResponse<UserPreference>>('/preferences', dto),
-    onSuccess: () => {
+    onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: ['preferences'] })
     },
   })
 
-  // Mutation to remove a preference (dislike)
   const removePreference = useMutation({
     mutationFn: (id: string) => 
       api.delete<ApiResponse<void>>(`/preferences/${id}`),

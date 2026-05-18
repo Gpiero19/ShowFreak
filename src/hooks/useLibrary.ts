@@ -16,6 +16,8 @@ export function useLibrary(params: LibraryQueryParams = {}) {
       if (params.genre) queryParams.append('genre', params.genre)
       if (params.status) queryParams.append('status', params.status)
       if (params.type) queryParams.append('type', params.type)
+      if (params.minImdbRating) queryParams.append('minImdbRating', params.minImdbRating.toString())
+      if (params.minPersonalRating) queryParams.append('minPersonalRating', params.minPersonalRating.toString())
 
       const queryString = queryParams.toString()
       const url = `/library${queryString ? `?${queryString}` : ''}`

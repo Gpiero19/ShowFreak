@@ -13,31 +13,34 @@ export default function Navbar() {
       <div className={styles.container}>
         {/* Left side - Navigation links */}
         <div className={styles.navLinks}>
-          <Link 
-            to="/" 
+          <Link
+            to="/"
             className={`${styles.navLink} ${isActive('/') ? styles.active : ''}`}
           >
             Home
           </Link>
-          <Link 
-            to="/search" 
+          <Link
+            to="/search"
             className={`${styles.navLink} ${isActive('/search') ? styles.active : ''}`}
           >
             Search
           </Link>
-          <Link 
-            to="/library" 
+          <Link
+            to="/library"
             className={`${styles.navLink} ${isActive('/library') ? styles.active : ''}`}
           >
             Library
           </Link>
-          <Link 
-            to="/preferences" 
-            className={`${styles.navLink} ${isActive('/preferences') ? styles.active : ''}`}
-          >
-            Preferences
-          </Link>
         </div>
+
+        {/* Center - Logo */}
+        <Link to="/" className={styles.logoLink}>
+          <img
+            src="/ShowFreak.png"
+            alt="ShowFreak"
+            style={{ height: '120px', width: 'auto' }}
+          />
+        </Link>
 
         {/* Right side - User info and logout */}
         <div className={styles.userSection}>
@@ -46,7 +49,7 @@ export default function Navbar() {
               {user.username}
             </span>
           )}
-          <button 
+          <button
             onClick={logout}
             className={styles.logoutBtn}
           >

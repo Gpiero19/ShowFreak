@@ -117,6 +117,8 @@ export interface LibraryQueryParams {
   genre?: string;
   status?: LibraryStatus;
   type?: ContentType;
+  minImdbRating?: number;
+  minPersonalRating?: number;
 }
 
 export interface User {

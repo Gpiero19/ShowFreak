@@ -5,6 +5,7 @@ export const recommendationController = {
   async getRecommendations(req: Request, res: Response) {
     try {
       const userId = (req as any).user?.id
+      const page = parseInt(req.query.page as string) || 1
       const limit = parseInt(req.query.limit as string) || 20
       const basedOn = req.query.based_on as string | undefined
 

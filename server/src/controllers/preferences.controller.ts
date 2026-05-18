@@ -1,16 +1,18 @@
 import { Request, Response } from 'express'
+import { preferencesService } from '../services/preferences.service.js'
 
 export const preferencesController = {
   async getAll(req: Request, res: Response) {
     try {
       const userId = (req as any).user?.id
+      const preferences = await preferencesService.getAll(userId)
 
       res.json({
         success: true,
-        data: [],
+        data: preferences,
       })
     } catch (error) {
-      console.error('Preferences getAll error:', error)
+      console.error('Preferences get error:', error)
       res.status(500).json({
         success: false,
         error: 'Internal server error',
@@ -24,11 +26,32 @@ export const preferencesController = {
       const userId = (req as any).user?.id
       const { externalId, contentType, dislikeReason } = req.body
 
+      if (!externalId || !contentType) {
+        return res.status(400).json({
+          success: false,
+          error: 'Missing required fields',
+          code: 'MISSING_FIELDS',
+        })
+      }
+
+      const preference = await preferencesService.create(userId, {
+        externalId,
+        contentType,
+        dislikeReason,
+      })
+
       res.status(201).json({
         success: true,
-        data: null,
+        data: preference,
       })
-    } catch (error) {
+    } catch (error: any) {
+      if (error.code === 'P2002') {
+        return res.status(409).json({
+          success: false,
+          error: 'Preference already exists',
+          code: 'DUPLICATE_PREFERENCE',
+        })
+      }
       console.error('Preferences create error:', error)
       res.status(500).json({
         success: false,
@@ -43,9 +66,9 @@ export const preferencesController = {
       const userId = (req as any).user?.id
       const { id } = req.params
 
-      res.status(204).json({
-        success: true,
-      })
+      await preferencesService.delete(id, userId)
+
+      res.status(204).send()
     } catch (error) {
       console.error('Preferences delete error:', error)
       res.status(500).json({

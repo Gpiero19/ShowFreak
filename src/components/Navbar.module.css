@@ -15,14 +15,27 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 2rem;
+  position: relative;
 }
 
-/* Navigation links - left side */
+/* Three-section layout */
 .navLinks {
   display: flex;
   align-items: center;
   gap: 2rem;
+}
+
+.logoLink {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  padding: 0;
+}
+
+.logoLink:hover {
+  opacity: 0.8;
 }
 
 .navLink {

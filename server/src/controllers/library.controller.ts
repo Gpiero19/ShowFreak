@@ -25,7 +25,7 @@ export const libraryController = {
   async getAll(req: Request, res: Response) {
     try {
       const userId = (req as any).user?.id
-      const { status, type, q, genre, sort = 'created_at', order = 'desc', page = 1, limit = 20, externalId } = req.query
+      const { status, type, q, genre, sort = 'created_at', order = 'desc', page = 1, limit = 20, externalId, minImdbRating, minPersonalRating } = req.query
 
       const whereClause: any = { userId }
 
@@ -41,28 +41,42 @@ export const libraryController = {
 
       // Build base query
       const buildWhere = () => {
+        let baseWhere = { ...whereClause }
+
         if (q) {
-          return {
-            ...whereClause,
-            content_cache: {
-              title: {
-                contains: q as string,
-                mode: 'insensitive',
-              },
+          baseWhere.content_cache = {
+            title: {
+              contains: q as string,
+              mode: 'insensitive',
+            },
+          }
+        } else if (genre) {
+          baseWhere.content_cache = {
+            genres: {
+              has: genre as string,
             },
           }
         }
-        if (genre) {
-          return {
-            ...whereClause,
-            content_cache: {
-              genres: {
-                has: genre as string,
-              },
-            },
+
+        // Add minimum rating filters to content_cache or libraryItem
+        if (minImdbRating) {
+          const rating = parseFloat(minImdbRating as string)
+          if (!baseWhere.content_cache) {
+            baseWhere.content_cache = {}
+          }
+          baseWhere.content_cache.voteAverage = {
+            gte: rating,
           }
         }
-        return whereClause
+
+        if (minPersonalRating) {
+          const rating = parseFloat(minPersonalRating as string)
+          baseWhere.personalRating = {
+            gte: rating,
+          }
+        }
+
+        return baseWhere
       }
 
       const where = buildWhere()
@@ -147,126 +161,159 @@ export const libraryController = {
     }
   },
 
-  async create(req: Request, res: Response) {
-    try {
-      const userId = (req as any).user?.id
-      const { externalId, contentType, status } = req.body
+   async create(req: Request, res: Response) {
+     try {
+       const userId = (req as any).user?.id
+       const { externalId, contentType, status, personalRating } = req.body
 
-      if (!externalId || !contentType || !status) {
-        return res.status(400).json({
-          success: false,
-          error: 'externalId, contentType, and status are required',
-          code: 'MISSING_FIELDS',
-        })
+       if (!externalId || !contentType || !status) {
+         return res.status(400).json({
+           success: false,
+           error: 'externalId, contentType, and status are required',
+           code: 'MISSING_FIELDS',
+         })
+       }
+
+       // Validate personalRating if provided
+       let validatedPersonalRating: number | undefined = undefined
+       if (personalRating !== undefined) {
+         const rating = parseInt(personalRating)
+         if (isNaN(rating) || rating < 1 || rating > 5) {
+           return res.status(400).json({
+             success: false,
+             error: 'Personal rating must be an integer between 1 and 5',
+             code: 'INVALID_RATING',
+           })
+         }
+         validatedPersonalRating = rating
+       }
+
+       const existing = await prisma.libraryItem.findFirst({
+         where: { userId, externalId, contentType },
+       })
+
+       if (existing) {
+         return res.status(409).json({
+           success: false,
+           error: 'Item already exists in library',
+           code: 'ALREADY_EXISTS',
+           data: existing,
+         })
+       }
+
+       const libraryItem = await prisma.libraryItem.create({
+         data: { 
+           userId, 
+           externalId, 
+           contentType, 
+           status,
+           ...(validatedPersonalRating !== undefined && { personalRating: validatedPersonalRating })
+         },
+         include: { content_cache: true },
+       })
+
+       const responseItem: LibraryItem = {
+         id: libraryItem.id,
+         userId: libraryItem.userId,
+         externalId: libraryItem.externalId,
+         contentType: libraryItem.contentType as 'movie' | 'tv',
+         status: libraryItem.status,
+         personalRating: libraryItem.personalRating ? Number(libraryItem.personalRating) : null,
+         notes: libraryItem.notes,
+         watchedAt: libraryItem.watchedAt,
+         createdAt: libraryItem.createdAt,
+         updatedAt: libraryItem.updatedAt,
+         title: libraryItem.content_cache.title,
+         posterPath: libraryItem.content_cache.posterPath,
+         voteAverage: libraryItem.content_cache.voteAverage ? Number(libraryItem.content_cache.voteAverage) : null,
+         releaseYear: libraryItem.content_cache.releaseYear,
+         genres: Array.isArray(libraryItem.content_cache.genres)
+           ? libraryItem.content_cache.genres as unknown as string[]
+           : [],
+       }
+
+       res.status(201).json({ success: true, data: responseItem })
+     } catch (error) {
+       console.error('Library create error:', error)
+       res.status(500).json({
+         success: false,
+         error: 'Internal server error',
+         code: 'INTERNAL_ERROR',
+       })
+     }
+   },
+
+   async update(req: Request, res: Response) {
+     try {
+       const userId = (req as any).user?.id
+       const { id } = req.params
+       const { status, personalRating, notes, watchedAt } = req.body
+
+       const existing = await prisma.libraryItem.findFirst({
+         where: { id, userId },
+       })
+
+       if (!existing) {
+         return res.status(404).json({
+           success: false,
+           error: 'Library item not found',
+           code: 'NOT_FOUND',
+         })
+       }
+
+       const updateData: any = {}
+       if (status !== undefined) updateData.status = status
+      if (personalRating !== undefined) {
+        // Validate personalRating is integer 1-5
+        const rating = parseInt(personalRating)
+        if (isNaN(rating) || rating < 1 || rating > 5) {
+          return res.status(400).json({
+            success: false,
+            error: 'Personal rating must be an integer between 1 and 5',
+            code: 'INVALID_RATING',
+          })
+        }
+        updateData.personalRating = rating
       }
+       if (notes !== undefined) updateData.notes = notes
+       if (watchedAt !== undefined) updateData.watchedAt = watchedAt
 
-      const existing = await prisma.libraryItem.findFirst({
-        where: { userId, externalId, contentType },
-      })
+       const libraryItem = await prisma.libraryItem.update({
+         where: { id },
+         data: updateData,
+         include: { content_cache: true },
+       })
 
-      if (existing) {
-        return res.status(409).json({
-          success: false,
-          error: 'Item already exists in library',
-          code: 'ALREADY_EXISTS',
-          data: existing,
-        })
-      }
+       const responseItem: LibraryItem = {
+         id: libraryItem.id,
+         userId: libraryItem.userId,
+         externalId: libraryItem.externalId,
+         contentType: libraryItem.contentType as 'movie' | 'tv',
+         status: libraryItem.status,
+         personalRating: libraryItem.personalRating ? Number(libraryItem.personalRating) : null,
+         notes: libraryItem.notes,
+         watchedAt: libraryItem.watchedAt,
+         createdAt: libraryItem.createdAt,
+         updatedAt: libraryItem.updatedAt,
+         title: libraryItem.content_cache.title,
+         posterPath: libraryItem.content_cache.posterPath,
+         voteAverage: libraryItem.content_cache.voteAverage ? Number(libraryItem.content_cache.voteAverage) : null,
+         releaseYear: libraryItem.content_cache.releaseYear,
+         genres: Array.isArray(libraryItem.content_cache.genres)
+           ? libraryItem.content_cache.genres as unknown as string[]
+           : [],
+       }
 
-      const libraryItem = await prisma.libraryItem.create({
-        data: { userId, externalId, contentType, status },
-        include: { content_cache: true },
-      })
-
-      const responseItem: LibraryItem = {
-        id: libraryItem.id,
-        userId: libraryItem.userId,
-        externalId: libraryItem.externalId,
-        contentType: libraryItem.contentType as 'movie' | 'tv',
-        status: libraryItem.status,
-        personalRating: libraryItem.personalRating ? Number(libraryItem.personalRating) : null,
-        notes: libraryItem.notes,
-        watchedAt: libraryItem.watchedAt,
-        createdAt: libraryItem.createdAt,
-        updatedAt: libraryItem.updatedAt,
-        title: libraryItem.content_cache.title,
-        posterPath: libraryItem.content_cache.posterPath,
-        voteAverage: libraryItem.content_cache.voteAverage ? Number(libraryItem.content_cache.voteAverage) : null,
-        releaseYear: libraryItem.content_cache.releaseYear,
-        genres: libraryItem.content_cache.genres as string[],
-      }
-
-      res.status(201).json({ success: true, data: responseItem })
-    } catch (error) {
-      console.error('Library create error:', error)
-      res.status(500).json({
-        success: false,
-        error: 'Internal server error',
-        code: 'INTERNAL_ERROR',
-      })
-    }
-  },
-
-  async update(req: Request, res: Response) {
-    try {
-      const userId = (req as any).user?.id
-      const { id } = req.params
-      const { status, personalRating, notes, watchedAt } = req.body
-
-      const existing = await prisma.libraryItem.findFirst({
-        where: { id, userId },
-      })
-
-      if (!existing) {
-        return res.status(404).json({
-          success: false,
-          error: 'Library item not found',
-          code: 'NOT_FOUND',
-        })
-      }
-
-      const updateData: any = {}
-      if (status !== undefined) updateData.status = status
-      if (personalRating !== undefined) updateData.personalRating = personalRating
-      if (notes !== undefined) updateData.notes = notes
-      if (watchedAt !== undefined) updateData.watchedAt = watchedAt
-
-      const libraryItem = await prisma.libraryItem.update({
-        where: { id },
-        data: updateData,
-        include: { content_cache: true },
-      })
-
-      const responseItem: LibraryItem = {
-        id: libraryItem.id,
-        userId: libraryItem.userId,
-        externalId: libraryItem.externalId,
-        contentType: libraryItem.contentType as 'movie' | 'tv',
-        status: libraryItem.status,
-        personalRating: libraryItem.personalRating ? Number(libraryItem.personalRating) : null,
-        notes: libraryItem.notes,
-        watchedAt: libraryItem.watchedAt,
-        createdAt: libraryItem.createdAt,
-        updatedAt: libraryItem.updatedAt,
-        title: libraryItem.content_cache.title,
-        posterPath: libraryItem.content_cache.posterPath,
-        voteAverage: libraryItem.content_cache.voteAverage ? Number(libraryItem.content_cache.voteAverage) : null,
-        releaseYear: libraryItem.content_cache.releaseYear,
-        genres: Array.isArray(libraryItem.content_cache.genres) 
-          ? libraryItem.content_cache.genres as unknown as string[]
-          : [],
-      }
-
-      return res.json({ success: true, data: responseItem })
-    } catch (error) {
-      console.error('Library update error:', error)
-      res.status(500).json({
-        success: false,
-        error: 'Internal server error',
-        code: 'INTERNAL_ERROR',
-      })
-    }
-  },
+       return res.json({ success: true, data: responseItem })
+     } catch (error) {
+       console.error('Library update error:', error)
+       res.status(500).json({
+         success: false,
+         error: 'Internal server error',
+         code: 'INTERNAL_ERROR',
+       })
+     }
+   },
 
   async delete(req: Request, res: Response) {
     try {

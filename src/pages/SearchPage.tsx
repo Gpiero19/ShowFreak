@@ -49,9 +49,9 @@ export default function SearchPage() {
           placeholder="Search movies and TV shows..."
           value={formQuery}
           onChange={(e) => setFormQuery(e.target.value)}
-          className="search-input"
+          className="filter-input"
         />
-        <button type="submit" className="search-button">
+        <button type="submit" className="toggle-btn">
           Search
         </button>
       </form>
