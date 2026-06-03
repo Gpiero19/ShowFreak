@@ -1,6 +1,7 @@
 import { Request, Response } from 'express'
 import { prisma } from '../lib/prisma.js'
 import { tmdb } from '../lib/tmdb.js'
+import { logger } from '../lib/logger.js'
 
 interface ContentItemBase {
   externalId: string

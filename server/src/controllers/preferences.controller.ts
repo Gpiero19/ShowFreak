@@ -1,5 +1,6 @@
 import { Request, Response } from 'express'
 import { preferencesService } from '../services/preferences.service.js'
+import { logger } from '../lib/logger.js'
 
 export const preferencesController = {
   async getAll(req: Request, res: Response) {
