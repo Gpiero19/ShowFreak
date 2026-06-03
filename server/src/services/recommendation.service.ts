@@ -1,7 +1,5 @@
-import { PrismaClient } from '@prisma/client'
+import { prisma } from '../lib/prisma.js'
 import { createTMDBService } from './tmdb.service.js'
-
-const prisma = new PrismaClient()
 
 interface RecommendationItem {
   externalId: string

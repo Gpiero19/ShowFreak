@@ -1,8 +1,6 @@
 import { Request, Response } from 'express'
-import { PrismaClient } from '@prisma/client'
+import { prisma } from '../lib/prisma.js'
 import { createTMDBService } from '../services/tmdb.service.js'
-
-const prisma = new PrismaClient()
 
 interface ContentItemBase {
   externalId: string
