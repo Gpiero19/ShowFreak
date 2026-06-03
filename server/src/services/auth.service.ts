@@ -10,6 +10,14 @@ interface User {
 }
 
 export const authService = {
+  async findUserByUsername(username: string): Promise<User | null> {
+    const user = await prisma.user.findUnique({
+      where: { username },
+    })
+    if (!user) return null
+    return { id: user.id, email: user.email, passwordHash: user.passwordHash, username: user.username, createdAt: user.createdAt }
+  },
+
   async findUserByEmail(email: string): Promise<User | null> {
     const user = await prisma.user.findUnique({
       where: { email },

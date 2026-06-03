@@ -29,12 +29,21 @@ export const authController = {
 
       const { email, password, username } = parsed.data
 
-      const existingUser = await authService.findUserByEmail(email)
-      if (existingUser) {
+      const existingEmail = await authService.findUserByEmail(email)
+      if (existingEmail) {
         return res.status(400).json({
           success: false,
           error: 'Email already exists',
           code: 'EMAIL_EXISTS',
+        })
+      }
+
+      const existingUsername = await authService.findUserByUsername(username)
+      if (existingUsername) {
+        return res.status(400).json({
+          success: false,
+          error: 'Username already taken',
+          code: 'USERNAME_TAKEN',
         })
       }
 
