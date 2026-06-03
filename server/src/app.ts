@@ -2,6 +2,7 @@ import express, { Application, Request, Response, NextFunction } from 'express'
 import cors from 'cors'
 import helmet from 'helmet'
 import pinoHttp from 'pino-http'
+import * as Sentry from '@sentry/node'
 import { logger } from './lib/logger.js'
 import authRoutes from './routes/auth.routes.js'
 import contentRoutes from './routes/content.routes.js'
@@ -31,6 +32,10 @@ app.use('/api/recommendations', recommendationsRoutes)
 app.use((_req: Request, res: Response) => {
   res.status(404).json({ success: false, error: 'Not found', code: 'NOT_FOUND' })
 })
+
+if (process.env.SENTRY_DSN) {
+  Sentry.setupExpressErrorHandler(app)
+}
 
 app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
   logger.error({ err }, 'Unhandled error')
