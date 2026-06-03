@@ -8,16 +8,17 @@ import AuthPage from './pages/AuthPage'
 import Navbar from './components/Navbar'
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
-  const { isAuthenticated } = useAuth()
+  const { isAuthenticated, isLoading } = useAuth()
+  if (isLoading) return null
   return isAuthenticated ? <>{children}</> : <Navigate to="/auth" />
 }
 
 function App() {
-  const { isAuthenticated } = useAuth()
+  const { isAuthenticated, isLoading } = useAuth()
   
   return (
     <>
-      {isAuthenticated && <Navbar />}
+      {!isLoading && isAuthenticated && <Navbar />}
       <Routes>
         <Route path="/auth" element={<AuthPage />} />
         <Route
