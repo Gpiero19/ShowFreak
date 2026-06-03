@@ -9,7 +9,7 @@ interface AuthContextType {
   isLoading: boolean
   login: (data: LoginRequest) => Promise<void>
   register: (data: RegisterRequest) => Promise<void>
-  logout: () => void
+  logout: () => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -29,48 +29,43 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsLoading(false)
   }, [])
 
+  const storeSession = (user: User, token: string, refreshToken: string) => {
+    setUser(user)
+    setToken(token)
+    localStorage.setItem('token', token)
+    localStorage.setItem('refreshToken', refreshToken)
+    localStorage.setItem('user', JSON.stringify(user))
+  }
+
   const login = async (data: LoginRequest) => {
     const response = await api.post('/auth/login', data)
-    const responseData = response.data
-    if (responseData.success && responseData.data) {
-      const { user, token } = responseData.data
-      setUser(user)
-      setToken(token)
-      localStorage.setItem('token', token)
-      localStorage.setItem('user', JSON.stringify(user))
-    }
+    const { user, token, refreshToken } = response.data.data
+    storeSession(user, token, refreshToken)
   }
 
   const register = async (data: RegisterRequest) => {
     const response = await api.post('/auth/register', data)
-    const responseData = response.data
-    if (responseData.success && responseData.data) {
-      const { user, token } = responseData.data
-      setUser(user)
-      setToken(token)
-      localStorage.setItem('token', token)
-      localStorage.setItem('user', JSON.stringify(user))
-    }
+    const { user, token, refreshToken } = response.data.data
+    storeSession(user, token, refreshToken)
   }
 
-  const logout = () => {
+  const logout = async () => {
+    const refreshToken = localStorage.getItem('refreshToken')
+    try {
+      if (refreshToken) await api.post('/auth/logout', { refreshToken })
+    } catch {
+      // ignore — clear local state regardless
+    }
     setUser(null)
     setToken(null)
     localStorage.removeItem('token')
+    localStorage.removeItem('refreshToken')
     localStorage.removeItem('user')
   }
 
   return (
     <AuthContext.Provider
-      value={{
-        user,
-        token,
-        isAuthenticated: !!user,
-        isLoading,
-        login,
-        register,
-        logout,
-      }}
+      value={{ user, token, isAuthenticated: !!user, isLoading, login, register, logout }}
     >
       {children}
     </AuthContext.Provider>
@@ -79,8 +74,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
 export function useAuth() {
   const context = useContext(AuthContext)
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider')
-  }
+  if (context === undefined) throw new Error('useAuth must be used within an AuthProvider')
   return context
 }

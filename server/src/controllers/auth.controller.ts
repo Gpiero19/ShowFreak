@@ -16,6 +16,10 @@ const loginSchema = z.object({
   password: z.string().min(1, { message: 'Password is required' }),
 })
 
+function signAccessToken(userId: string, email: string) {
+  return jwt.sign({ userId, email }, config.jwt.secret, { expiresIn: config.jwt.expiresIn })
+}
+
 export const authController = {
   async register(req: Request, res: Response) {
     try {
@@ -49,31 +53,20 @@ export const authController = {
       }
 
       const user = await authService.createUser(email, password, username)
-      const token = jwt.sign(
-        { userId: user.id, email: user.email },
-        config.jwt.secret,
-        { expiresIn: config.jwt.expiresIn }
-      )
+      const token = signAccessToken(user.id, user.email)
+      const refreshToken = await authService.createRefreshToken(user.id)
 
       res.status(201).json({
         success: true,
         data: {
-          user: {
-            id: user.id,
-            email: user.email,
-            username: user.username,
-            createdAt: user.createdAt,
-          },
+          user: { id: user.id, email: user.email, username: user.username, createdAt: user.createdAt },
           token,
+          refreshToken,
         },
       })
     } catch (error) {
       logger.error({ err: error }, 'Register error')
-      res.status(500).json({
-        success: false,
-        error: 'Internal server error',
-        code: 'INTERNAL_ERROR',
-      })
+      res.status(500).json({ success: false, error: 'Internal server error', code: 'INTERNAL_ERROR' })
     }
   },
 
@@ -92,47 +85,73 @@ export const authController = {
 
       const user = await authService.findUserByEmail(email)
       if (!user) {
-        return res.status(401).json({
-          success: false,
-          error: 'Invalid credentials',
-          code: 'INVALID_CREDENTIALS',
-        })
+        return res.status(401).json({ success: false, error: 'Invalid credentials', code: 'INVALID_CREDENTIALS' })
       }
 
       const isValid = await authService.verifyPassword(password, user.passwordHash)
       if (!isValid) {
-        return res.status(401).json({
-          success: false,
-          error: 'Invalid credentials',
-          code: 'INVALID_CREDENTIALS',
-        })
+        return res.status(401).json({ success: false, error: 'Invalid credentials', code: 'INVALID_CREDENTIALS' })
       }
 
-      const token = jwt.sign(
-        { userId: user.id, email: user.email },
-        config.jwt.secret,
-        { expiresIn: config.jwt.expiresIn }
-      )
+      const token = signAccessToken(user.id, user.email)
+      const refreshToken = await authService.createRefreshToken(user.id)
 
       res.json({
         success: true,
         data: {
-          user: {
-            id: user.id,
-            email: user.email,
-            username: user.username,
-            createdAt: user.createdAt,
-          },
+          user: { id: user.id, email: user.email, username: user.username, createdAt: user.createdAt },
           token,
+          refreshToken,
         },
       })
     } catch (error) {
       logger.error({ err: error }, 'Login error')
-      res.status(500).json({
-        success: false,
-        error: 'Internal server error',
-        code: 'INTERNAL_ERROR',
+      res.status(500).json({ success: false, error: 'Internal server error', code: 'INTERNAL_ERROR' })
+    }
+  },
+
+  async refresh(req: Request, res: Response) {
+    try {
+      const { refreshToken } = req.body
+      if (!refreshToken) {
+        return res.status(401).json({ success: false, error: 'Refresh token required', code: 'NO_TOKEN' })
+      }
+
+      const userId = await authService.validateRefreshToken(refreshToken)
+      if (!userId) {
+        return res.status(401).json({ success: false, error: 'Invalid or expired refresh token', code: 'INVALID_TOKEN' })
+      }
+
+      const user = await authService.findUserById(userId)
+      if (!user) {
+        return res.status(401).json({ success: false, error: 'User not found', code: 'USER_NOT_FOUND' })
+      }
+
+      // Rotate: revoke old, issue new
+      await authService.revokeRefreshToken(refreshToken)
+      const newToken = signAccessToken(user.id, user.email)
+      const newRefreshToken = await authService.createRefreshToken(user.id)
+
+      res.json({
+        success: true,
+        data: { token: newToken, refreshToken: newRefreshToken },
       })
+    } catch (error) {
+      logger.error({ err: error }, 'Refresh error')
+      res.status(500).json({ success: false, error: 'Internal server error', code: 'INTERNAL_ERROR' })
+    }
+  },
+
+  async logout(req: Request, res: Response) {
+    try {
+      const { refreshToken } = req.body
+      if (refreshToken) {
+        await authService.revokeRefreshToken(refreshToken)
+      }
+      res.status(204).send()
+    } catch (error) {
+      logger.error({ err: error }, 'Logout error')
+      res.status(500).json({ success: false, error: 'Internal server error', code: 'INTERNAL_ERROR' })
     }
   },
 
@@ -142,38 +161,21 @@ export const authController = {
       const userId = authReq.user?.id
 
       if (!userId) {
-        return res.status(401).json({
-          success: false,
-          error: 'User not found',
-          code: 'USER_NOT_FOUND',
-        })
+        return res.status(401).json({ success: false, error: 'User not found', code: 'USER_NOT_FOUND' })
       }
 
       const user = await authService.findUserById(userId)
       if (!user) {
-        return res.status(404).json({
-          success: false,
-          error: 'User not found',
-          code: 'USER_NOT_FOUND',
-        })
+        return res.status(404).json({ success: false, error: 'User not found', code: 'USER_NOT_FOUND' })
       }
 
       res.json({
         success: true,
-        data: {
-          id: user.id,
-          email: user.email,
-          username: user.username,
-          createdAt: user.createdAt,
-        },
+        data: { id: user.id, email: user.email, username: user.username, createdAt: user.createdAt },
       })
     } catch (error) {
       logger.error({ err: error }, 'Me error')
-      res.status(500).json({
-        success: false,
-        error: 'Internal server error',
-        code: 'INTERNAL_ERROR',
-      })
+      res.status(500).json({ success: false, error: 'Internal server error', code: 'INTERNAL_ERROR' })
     }
   },
 }

@@ -41,7 +41,8 @@ export const config = {
     secret: isProduction
       ? requireSecret('JWT_SECRET')
       : (process.env.JWT_SECRET || 'dev-only-secret-do-not-use-in-production'),
-    expiresIn: (process.env.JWT_EXPIRES_IN || '7d') as StringValue,
+    expiresIn: (process.env.JWT_EXPIRES_IN || '15m') as StringValue,
+    refreshExpiresInMs: 7 * 24 * 60 * 60 * 1000,
   },
   tmdb: {
     apiKey: requireEnv('TMDB_API_KEY'),

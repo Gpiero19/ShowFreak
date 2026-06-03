@@ -50,7 +50,7 @@ export default function Navbar() {
             </span>
           )}
           <button
-            onClick={logout}
+            onClick={() => logout()}
             className={styles.logoutBtn}
           >
             Logout

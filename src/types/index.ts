@@ -147,6 +147,7 @@ export interface RegisterRequest {
 export interface AuthResponse {
   user: User;
   token: string;
+  refreshToken: string;
 }
 
 export interface UserPreference {

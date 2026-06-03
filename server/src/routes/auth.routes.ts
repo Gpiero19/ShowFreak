@@ -23,6 +23,8 @@ const registerLimiter = rateLimit({
 
 router.post('/register', registerLimiter, authController.register)
 router.post('/login', loginLimiter, authController.login)
+router.post('/refresh', authController.refresh)
+router.post('/logout', authController.logout)
 router.get('/me', authMiddleware, authController.me)
 
 export default router

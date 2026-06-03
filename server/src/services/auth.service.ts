@@ -1,5 +1,7 @@
 import bcrypt from 'bcrypt'
+import crypto from 'crypto'
 import { prisma } from '../lib/prisma.js'
+import { config } from '../config/index.js'
 
 interface User {
   id: string
@@ -72,5 +74,29 @@ export const authService = {
 
   async verifyPassword(password: string, passwordHash: string): Promise<boolean> {
     return bcrypt.compare(password, passwordHash)
+  },
+
+  async createRefreshToken(userId: string): Promise<string> {
+    const token = crypto.randomBytes(64).toString('hex')
+    const expiresAt = new Date(Date.now() + config.jwt.refreshExpiresInMs)
+    await prisma.refreshToken.create({ data: { token, userId, expiresAt } })
+    return token
+  },
+
+  async validateRefreshToken(token: string): Promise<string | null> {
+    const record = await prisma.refreshToken.findUnique({ where: { token } })
+    if (!record || record.expiresAt < new Date()) {
+      if (record) await prisma.refreshToken.delete({ where: { token } })
+      return null
+    }
+    return record.userId
+  },
+
+  async revokeRefreshToken(token: string): Promise<void> {
+    await prisma.refreshToken.deleteMany({ where: { token } })
+  },
+
+  async revokeAllUserRefreshTokens(userId: string): Promise<void> {
+    await prisma.refreshToken.deleteMany({ where: { userId } })
   },
 }
