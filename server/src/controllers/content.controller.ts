@@ -97,7 +97,7 @@ export const contentController = {
         },
       })
     } catch (error) {
-      console.error('Content search error:', error)
+      logger.error({ err: error }, 'Content search error')
       res.status(500).json({
         success: false,
         error: 'Internal server error',
@@ -214,7 +214,7 @@ export const contentController = {
         },
       })
     } catch (error: any) {
-      console.error('Content details error:', error)
+      logger.error({ err: error }, 'Content details error')
       if (error.response?.status === 404) {
         return res.status(404).json({
           success: false,
@@ -267,7 +267,7 @@ export const contentController = {
         data: results,
       })
     } catch (error) {
-      console.error('Content similar error:', error)
+      logger.error({ err: error }, 'Content similar error')
       res.status(500).json({
         success: false,
         error: 'Internal server error',

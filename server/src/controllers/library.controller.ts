@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import { prisma } from '../lib/prisma.js'
+import { prisma } from '../lib/prisma.js'\nimport { logger } from '../lib/logger.js'
 
 interface LibraryItem {
   id: string
@@ -150,7 +150,7 @@ export const libraryController = {
         },
       })
     } catch (error) {
-      console.error('Library getAll error:', error)
+      logger.error({ err: error }, 'Library getAll error')
       res.status(500).json({
         success: false,
         error: 'Internal server error',
@@ -232,7 +232,7 @@ export const libraryController = {
 
        res.status(201).json({ success: true, data: responseItem })
      } catch (error) {
-       console.error('Library create error:', error)
+       logger.error({ err: error }, 'Library create error')
        res.status(500).json({
          success: false,
          error: 'Internal server error',
@@ -304,7 +304,7 @@ export const libraryController = {
 
        return res.json({ success: true, data: responseItem })
      } catch (error) {
-       console.error('Library update error:', error)
+       logger.error({ err: error }, 'Library update error')
        res.status(500).json({
          success: false,
          error: 'Internal server error',
@@ -333,7 +333,7 @@ export const libraryController = {
       await prisma.libraryItem.delete({ where: { id } })
       res.status(204).json({ success: true })
     } catch (error) {
-      console.error('Library delete error:', error)
+      logger.error({ err: error }, 'Library delete error')
       res.status(500).json({
         success: false,
         error: 'Internal server error',

@@ -12,7 +12,7 @@ export const preferencesController = {
         data: preferences,
       })
     } catch (error) {
-      console.error('Preferences get error:', error)
+      logger.error({ err: error }, 'Preferences get error')
       res.status(500).json({
         success: false,
         error: 'Internal server error',
@@ -52,7 +52,7 @@ export const preferencesController = {
           code: 'DUPLICATE_PREFERENCE',
         })
       }
-      console.error('Preferences create error:', error)
+      logger.error({ err: error }, 'Preferences create error')
       res.status(500).json({
         success: false,
         error: 'Internal server error',
@@ -70,7 +70,7 @@ export const preferencesController = {
 
       res.status(204).send()
     } catch (error) {
-      console.error('Preferences delete error:', error)
+      logger.error({ err: error }, 'Preferences delete error')
       res.status(500).json({
         success: false,
         error: 'Internal server error',

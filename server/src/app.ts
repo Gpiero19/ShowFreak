@@ -1,6 +1,8 @@
 import express, { Application, Request, Response, NextFunction } from 'express'
 import cors from 'cors'
 import helmet from 'helmet'
+import pinoHttp from 'pino-http'
+import { logger } from './lib/logger.js'
 import authRoutes from './routes/auth.routes.js'
 import contentRoutes from './routes/content.routes.js'
 import libraryRoutes from './routes/library.routes.js'
@@ -13,6 +15,7 @@ const allowedOrigin = process.env.CORS_ORIGIN || 'http://localhost:5173'
 
 app.use(helmet())
 app.use(cors({ origin: allowedOrigin, credentials: true }))
+app.use(pinoHttp({ logger }))
 app.use(express.json())
 
 app.get('/health', (_req: Request, res: Response) => {
@@ -30,7 +33,7 @@ app.use((_req: Request, res: Response) => {
 })
 
 app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
-  console.error('Error:', err)
+  logger.error({ err }, 'Unhandled error')
   res.status(500).json({
     success: false,
     error: 'Internal server error',

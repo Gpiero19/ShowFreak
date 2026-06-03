@@ -1,5 +1,6 @@
 import { Request, Response } from 'express'
 import { recommendationService } from '../services/recommendation.service.js'
+import { logger } from '../lib/logger.js'
 
 export const recommendationController = {
   async getRecommendations(req: Request, res: Response) {
@@ -28,7 +29,7 @@ export const recommendationController = {
         pagination: result.pagination,
       })
     } catch (error: any) {
-      console.error('Recommendations error:', error)
+      logger.error({ err: error }, 'Recommendations error')
       if (error.code === 'RATE_LIMIT_EXCEEDED') {
         return res.status(429).json({
           success: false,

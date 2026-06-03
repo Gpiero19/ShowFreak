@@ -2,6 +2,7 @@ import { Request, Response } from 'express'
 import { z } from 'zod'
 import { authService } from '../services/auth.service.js'
 import { config } from '../config/index.js'
+import { logger } from '../lib/logger.js'
 import jwt from 'jsonwebtoken'
 
 const registerSchema = z.object({
@@ -67,7 +68,7 @@ export const authController = {
         },
       })
     } catch (error) {
-      console.error('Register error:', error)
+      logger.error({ err: error }, 'Register error')
       res.status(500).json({
         success: false,
         error: 'Internal server error',
@@ -126,7 +127,7 @@ export const authController = {
         },
       })
     } catch (error) {
-      console.error('Login error:', error)
+      logger.error({ err: error }, 'Login error')
       res.status(500).json({
         success: false,
         error: 'Internal server error',
@@ -167,7 +168,7 @@ export const authController = {
         },
       })
     } catch (error) {
-      console.error('Me error:', error)
+      logger.error({ err: error }, 'Me error')
       res.status(500).json({
         success: false,
         error: 'Internal server error',
