@@ -22,13 +22,12 @@ export const recommendationService = {
       }
     }
 
-    // Get user's library items
+    // Get user's library items — capped at 200 most recent for genre weighting
     const libraryItems = await prisma.libraryItem.findMany({
       where: { userId },
-      include: {
-        content_cache: true,
-      },
-      orderBy: { watchedAt: 'desc' },
+      include: { content_cache: true },
+      orderBy: { createdAt: 'desc' },
+      take: 200,
     })
 
     if (libraryItems.length === 0) {
@@ -74,9 +73,6 @@ export const recommendationService = {
       .sort(([,a], [,b]) => b - a)
       .slice(0, 3)
       .map(([id]) => id)
-
-    // 4. Determine preferred type
-    const preferredType = contentTypeCounts.movie >= contentTypeCounts.tv ? 'movie' : 'tv'
 
     // 5. Query TMDB discover
     const discoverParams: any = {
@@ -163,10 +159,11 @@ export const recommendationService = {
       : tmdb.getSimilarTVShows(contentId)
     )
 
-    // Exclude items already in library and disliked
+    // Exclude items already in library and disliked — capped at 500 for the filter set
     const libraryItems = await prisma.libraryItem.findMany({
       where: { userId },
       select: { externalId: true },
+      take: 500,
     })
     const libraryIds = new Set(libraryItems.map(li => li.externalId))
 
