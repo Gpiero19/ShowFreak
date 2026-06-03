@@ -1,5 +1,6 @@
 import express, { Application, Request, Response, NextFunction } from 'express'
 import cors from 'cors'
+import helmet from 'helmet'
 import authRoutes from './routes/auth.routes.js'
 import contentRoutes from './routes/content.routes.js'
 import libraryRoutes from './routes/library.routes.js'
@@ -8,7 +9,10 @@ import recommendationsRoutes from './routes/recommendations.routes.js'
 
 const app: Application = express()
 
-app.use(cors())
+const allowedOrigin = process.env.CORS_ORIGIN || 'http://localhost:5173'
+
+app.use(helmet())
+app.use(cors({ origin: allowedOrigin, credentials: true }))
 app.use(express.json())
 
 app.get('/health', (_req: Request, res: Response) => {
