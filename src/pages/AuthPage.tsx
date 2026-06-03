@@ -79,14 +79,22 @@ export default function AuthPage() {
           required
           style={{ padding: '12px', border: '1px solid #ccc', borderRadius: '4px' }}
         />
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-          style={{ padding: '12px', border: '1px solid #ccc', borderRadius: '4px' }}
-        />
+        <div>
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            minLength={8}
+            style={{ padding: '12px', border: '1px solid #ccc', borderRadius: '4px', width: '100%', boxSizing: 'border-box' }}
+          />
+          {!isLogin && (
+            <p style={{ margin: '4px 0 0', fontSize: '0.75rem', color: '#9ca3af' }}>
+              Minimum 8 characters
+            </p>
+          )}
+        </div>
         <button
           type="submit"
           style={{

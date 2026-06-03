@@ -1,12 +1,33 @@
 import { Request, Response } from 'express'
+import { z } from 'zod'
 import { authService } from '../services/auth.service.js'
 import { config } from '../config/index.js'
 import jwt from 'jsonwebtoken'
 
+const registerSchema = z.object({
+  email: z.string().email({ message: 'Invalid email address' }),
+  password: z.string().min(8, { message: 'Password must be at least 8 characters' }),
+  username: z.string().min(2, { message: 'Username must be at least 2 characters' }).max(100),
+})
+
+const loginSchema = z.object({
+  email: z.string().email({ message: 'Invalid email address' }),
+  password: z.string().min(1, { message: 'Password is required' }),
+})
+
 export const authController = {
   async register(req: Request, res: Response) {
     try {
-      const { email, password, username } = req.body
+      const parsed = registerSchema.safeParse(req.body)
+      if (!parsed.success) {
+        return res.status(400).json({
+          success: false,
+          error: parsed.error.issues[0].message,
+          code: 'VALIDATION_ERROR',
+        })
+      }
+
+      const { email, password, username } = parsed.data
 
       const existingUser = await authService.findUserByEmail(email)
       if (existingUser) {
@@ -48,7 +69,16 @@ export const authController = {
 
   async login(req: Request, res: Response) {
     try {
-      const { email, password } = req.body
+      const parsed = loginSchema.safeParse(req.body)
+      if (!parsed.success) {
+        return res.status(400).json({
+          success: false,
+          error: parsed.error.issues[0].message,
+          code: 'VALIDATION_ERROR',
+        })
+      }
+
+      const { email, password } = parsed.data
 
       const user = await authService.findUserByEmail(email)
       if (!user) {
