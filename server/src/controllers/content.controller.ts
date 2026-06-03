@@ -50,6 +50,7 @@ export const contentController = {
             voteAverage: item.vote_average,
             releaseYear,
             genres: item.genre_ids || [],
+            overview: item.overview || '',
             cachedAt: new Date(),
             expiresAt,
           }
@@ -120,74 +121,97 @@ export const contentController = {
 
       const contentType = type as 'movie' | 'tv'
 
-       // Get details from TMDB
-       const data = await (contentType === 'movie'
-         ? tmdb.getMovieDetails(id)
-         : tmdb.getTVShowDetails(id)
-       )
+      // Check cache first — skip TMDB if we have a fresh entry with overview
+      const cached = await prisma.contentCache.findFirst({
+        where: {
+          externalId: id,
+          contentType,
+          expiresAt: { gt: new Date() },
+          overview: { not: null },
+        },
+      })
 
-       // Extract genre IDs for caching and names for frontend response
-       const genreIds = data.genres?.map((g: any) => g.id) || []
-       const genreNames = data.genres?.map((g: any) => g.name) || []
+      if (cached) {
+        return res.json({
+          success: true,
+          data: {
+            externalId: id,
+            contentType,
+            title: cached.title,
+            posterPath: cached.posterPath,
+            voteAverage: cached.voteAverage ? Number(cached.voteAverage) : null,
+            releaseYear: cached.releaseYear,
+            genres: Array.isArray(cached.genres) ? cached.genres : [],
+            overview: cached.overview ?? '',
+            tagline: null,
+            runtime: null,
+            status: '',
+            voteCount: null,
+            popularity: null,
+            backdropPath: null,
+            originalLanguage: '',
+          },
+        })
+      }
 
-       // Cache/update content_cache using composite key (store genre IDs)
-       await prisma.contentCache.upsert({
-         where: {
-           externalId_contentType: {
-             externalId: id,
-             contentType,
-           },
-         },
-         update: {
-           contentType,
-           title: data.title || data.name,
-           posterPath: data.poster_path,
-           voteAverage: data.vote_average,
-           releaseYear: (data.release_date || data.first_air_date)?.split('-')[0] 
-             ? parseInt((data.release_date || data.first_air_date)?.split('-')[0]!)
-             : null,
-           genres: genreIds,
-           cachedAt: new Date(),
-           expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
-         },
-         create: {
-           externalId: id,
-           contentType,
-           title: data.title || data.name,
-           posterPath: data.poster_path,
-           voteAverage: data.vote_average,
-           releaseYear: (data.release_date || data.first_air_date)?.split('-')[0] 
-             ? parseInt((data.release_date || data.first_air_date)?.split('-')[0]!)
-             : null,
-           genres: genreIds,
-           cachedAt: new Date(),
-           expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
-         },
-       })
+      // Cache miss or expired — fetch from TMDB
+      const data = await (contentType === 'movie'
+        ? tmdb.getMovieDetails(id)
+        : tmdb.getTVShowDetails(id)
+      )
 
-       const details = {
-         externalId: id,
-         contentType,
-         title: data.title || data.name,
-         posterPath: data.poster_path,
-         voteAverage: data.vote_average,
-         releaseYear: (data.release_date || data.first_air_date)?.split('-')[0] 
-           ? parseInt((data.release_date || data.first_air_date)?.split('-')[0]!)
-           : null,
-         genres: genreNames,
-         overview: data.overview || '',
-         tagline: data.tagline,
-         runtime: data.runtime || data.episode_run_time?.[0] || null,
-         status: data.status || '',
-         voteCount: data.vote_count,
-         popularity: data.popularity,
-         backdropPath: data.backdrop_path,
-         originalLanguage: data.original_language || '',
-       }
+      const genreIds = data.genres?.map((g: any) => g.id) || []
+      const genreNames = data.genres?.map((g: any) => g.name) || []
+      const releaseYear = (data.release_date || data.first_air_date)?.split('-')[0]
+        ? parseInt((data.release_date || data.first_air_date).split('-')[0])
+        : null
+      const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000)
+
+      await prisma.contentCache.upsert({
+        where: { externalId_contentType: { externalId: id, contentType } },
+        update: {
+          title: data.title || data.name,
+          posterPath: data.poster_path,
+          voteAverage: data.vote_average,
+          releaseYear,
+          genres: genreIds,
+          overview: data.overview || '',
+          cachedAt: new Date(),
+          expiresAt,
+        },
+        create: {
+          externalId: id,
+          contentType,
+          title: data.title || data.name,
+          posterPath: data.poster_path,
+          voteAverage: data.vote_average,
+          releaseYear,
+          genres: genreIds,
+          overview: data.overview || '',
+          cachedAt: new Date(),
+          expiresAt,
+        },
+      })
 
       return res.json({
         success: true,
-        data: details,
+        data: {
+          externalId: id,
+          contentType,
+          title: data.title || data.name,
+          posterPath: data.poster_path,
+          voteAverage: data.vote_average,
+          releaseYear,
+          genres: genreNames,
+          overview: data.overview || '',
+          tagline: data.tagline,
+          runtime: data.runtime || data.episode_run_time?.[0] || null,
+          status: data.status || '',
+          voteCount: data.vote_count,
+          popularity: data.popularity,
+          backdropPath: data.backdrop_path,
+          originalLanguage: data.original_language || '',
+        },
       })
     } catch (error: any) {
       console.error('Content details error:', error)

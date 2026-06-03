@@ -27,6 +27,7 @@ model ContentCache {
   voteAverage   Decimal?      @map("vote_average") @db.Decimal(3, 1)
   releaseYear   Int?          @map("release_year")
   genres        Json
+  overview      String?
   cachedAt      DateTime      @default(now()) @map("cached_at") @db.Timestamptz(6)
   expiresAt     DateTime      @map("expires_at") @db.Timestamptz(6)
   library_items LibraryItem[]
