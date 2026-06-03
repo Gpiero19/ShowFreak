@@ -1,5 +1,5 @@
 import { prisma } from '../lib/prisma.js'
-import { createTMDBService } from './tmdb.service.js'
+import { tmdb } from '../lib/tmdb.js'
 
 interface RecommendationItem {
   externalId: string
@@ -79,12 +79,6 @@ export const recommendationService = {
     const preferredType = contentTypeCounts.movie >= contentTypeCounts.tv ? 'movie' : 'tv'
 
     // 5. Query TMDB discover
-    const tmdb = createTMDBService(
-      process.env.TMDB_API_KEY!,
-      process.env.TMDB_BASE_URL,
-      process.env.TMDB_IMAGE_BASE
-    )
-
     const discoverParams: any = {
       with_genres: topGenres.join(','),
       sort_by: 'vote_average.desc',
@@ -163,11 +157,6 @@ export const recommendationService = {
   },
 
   async getSimilarRecommendations(userId: string, contentId: string, type: 'movie' | 'tv', limit: number = 20) {
-    const tmdb = createTMDBService(
-      process.env.TMDB_API_KEY!,
-      process.env.TMDB_BASE_URL,
-      process.env.TMDB_IMAGE_BASE
-    )
 
     const data = await (type === 'movie'
       ? tmdb.getSimilarMovies(contentId)
@@ -216,11 +205,6 @@ export const recommendationService = {
   },
 
   async getTrendingRecommendations(limit: number = 20) {
-    const tmdb = createTMDBService(
-      process.env.TMDB_API_KEY!,
-      process.env.TMDB_BASE_URL,
-      process.env.TMDB_IMAGE_BASE
-    )
 
     const trending = await tmdb.getTrending('all', 'week')
     const results = (trending.results || []).slice(0, limit).map((item: any) => ({

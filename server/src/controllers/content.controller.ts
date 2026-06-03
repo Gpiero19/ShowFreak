@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
 import { prisma } from '../lib/prisma.js'
-import { createTMDBService } from '../services/tmdb.service.js'
+import { tmdb } from '../lib/tmdb.js'
 
 interface ContentItemBase {
   externalId: string
@@ -33,13 +33,7 @@ export const contentController = {
       const allResults: ContentItemBase[] = []
 
       for (const contentType of contentTypes) {
-        const tmdb = createTMDBService(
-          process.env.TMDB_API_KEY!,
-          process.env.TMDB_BASE_URL,
-          process.env.TMDB_IMAGE_BASE
-        )
-
-        const data = await (contentType === 'movie' 
+        const data = await (contentType === 'movie'
           ? tmdb.searchMovies(query, parseInt(page as string))
           : tmdb.searchTVShows(query, parseInt(page as string))
         )
@@ -140,11 +134,6 @@ export const contentController = {
       }
 
       const contentType = type as 'movie' | 'tv'
-      const tmdb = createTMDBService(
-        process.env.TMDB_API_KEY!,
-        process.env.TMDB_BASE_URL,
-        process.env.TMDB_IMAGE_BASE
-      )
 
        // Get details from TMDB
        const data = await (contentType === 'movie'
@@ -246,11 +235,6 @@ export const contentController = {
       }
 
       const contentType = type as 'movie' | 'tv'
-      const tmdb = createTMDBService(
-        process.env.TMDB_API_KEY!,
-        process.env.TMDB_BASE_URL,
-        process.env.TMDB_IMAGE_BASE
-      )
 
       const data = await (contentType === 'movie'
         ? tmdb.getSimilarMovies(id, parseInt(page as string))
