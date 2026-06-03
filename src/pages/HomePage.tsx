@@ -1,10 +1,12 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useRecommendations } from '../hooks/useRecommendations'
+import { usePreferences } from '../hooks/usePreferences'
 import { ContentCard } from '../components/search/ContentCard'
 import { ContentType } from '../types'
 
 export default function HomePage() {
   const [activeType, setActiveType] = useState<ContentType | ''>('')
+  const { preferences } = usePreferences()
   
   const {
     data,
@@ -84,14 +86,16 @@ export default function HomePage() {
           <>
             <div className="content-grid">
               {filteredItems.map((item, index) => {
+                const pref = preferences.find(p => p.externalId === item.externalId && p.contentType === item.contentType)
+                const cardProps = { content: item, isDisliked: !!pref, preferenceId: pref?.id }
                 if (filteredItems.length === index + 1) {
                   return (
                     <div ref={lastItemRef} key={item.externalId}>
-                      <ContentCard content={item} />
+                      <ContentCard {...cardProps} />
                     </div>
                   )
                 }
-                return <ContentCard key={item.externalId} content={item} />
+                return <ContentCard key={item.externalId} {...cardProps} />
               })}
             </div>
 

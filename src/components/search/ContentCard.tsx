@@ -1,45 +1,29 @@
 import { useNavigate } from 'react-router-dom'
-import { ContentSearchResult, ContentType, LibraryItem, Recommendation } from '../../types'
+import { ContentSearchResult, LibraryItem, Recommendation } from '../../types'
 import { usePreferenceMutations } from '../../hooks/usePreferenceMutations'
-import { usePreferences } from '../../hooks/usePreferences'
 
 interface ContentCardProps {
   content: ContentSearchResult | LibraryItem | Recommendation
+  isDisliked?: boolean
+  preferenceId?: string
 }
 
-export function ContentCard({ content }: ContentCardProps) {
+export function ContentCard({ content, isDisliked = false, preferenceId }: ContentCardProps) {
   const navigate = useNavigate()
   const { addDislike, removeDislike, isAdding, isRemoving } = usePreferenceMutations()
-  const { preferences, isLoading: isLoadingPrefs } = usePreferences()
 
-  // Normalize externalId to string for comparison
   const contentExternalId = String(content.externalId)
   const contentType = content.contentType
 
-  const isDisliked = !isLoadingPrefs && preferences.some(
-    (pref) => String(pref.externalId) === contentExternalId && pref.contentType === contentType
-  )
-
   const handleDislikeClick = async (e: React.MouseEvent) => {
-    // Stop event from bubbling to the card click handler
     e.preventDefault()
     e.stopPropagation()
-    
     if (isAdding || isRemoving) return
-    
     try {
-      if (isDisliked) {
-        const pref = preferences.find(
-          (p) => String(p.externalId) === contentExternalId && p.contentType === contentType
-        )
-        if (pref) {
-          await removeDislike(pref.id)
-        }
+      if (isDisliked && preferenceId) {
+        await removeDislike(preferenceId)
       } else {
-        await addDislike({
-          externalId: contentExternalId,
-          contentType: contentType,
-        })
+        await addDislike({ externalId: contentExternalId, contentType })
       }
     } catch (error: any) {
       console.error('Dislike action failed:', error)
@@ -48,23 +32,6 @@ export function ContentCard({ content }: ContentCardProps) {
 
   const handleCardClick = () => {
     navigate(`/details/${contentExternalId}?type=${contentType}`)
-  }
-
-  if (isLoadingPrefs) {
-    return (
-      <div className="content-card" onClick={handleCardClick}>
-        <div style={{ position: 'relative' }}>
-          {content.posterPath && (
-            <img
-              src={`https://image.tmdb.org/t/p/w500${content.posterPath}`}
-              alt={content.title}
-            />
-          )}
-        </div>
-        <h3>{content.title}</h3>
-        <p>{content.releaseYear}</p>
-      </div>
-    )
   }
 
   return (

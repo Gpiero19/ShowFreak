@@ -252,9 +252,17 @@ export default function LibraryPage() {
           <div className="library-content">
             {data?.data.data && data.data.data.length > 0 ? (
               <div className="content-grid">
-                {data.data.data.map((item) => (
-                  <ContentCard key={item.id} content={item} />
-                ))}
+                {data.data.data.map((item) => {
+                  const pref = dislikes.find(p => p.externalId === item.externalId && p.contentType === item.contentType)
+                  return (
+                    <ContentCard
+                      key={item.id}
+                      content={item}
+                      isDisliked={!!pref}
+                      preferenceId={pref?.id}
+                    />
+                  )
+                })}
               </div>
             ) : (
               <p>Your library is empty. Add some content to get started!</p>

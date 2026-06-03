@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query'
 import api from '../services/api'
 import { ContentCard } from '../components/search/ContentCard'
 import { ApiResponse, PaginatedResponse, ContentSearchResult } from '../types'
+import { usePreferences } from '../hooks/usePreferences'
 
 interface SearchResponseData {
   data: PaginatedResponse<ContentSearchResult>
@@ -20,6 +21,8 @@ export default function SearchPage() {
   // Initialize form state with URL query
   const [formQuery, setFormQuery] = useState(urlQuery)
   
+  const { preferences } = usePreferences()
+
   const { data, isLoading, error } = useQuery<ApiResponse<PaginatedResponse<ContentSearchResult>>>({
     queryKey: ['search', formQuery],
     queryFn: async () => {
@@ -64,9 +67,17 @@ export default function SearchPage() {
         <div className="search-results">
           {data?.data.data && data.data.data.length > 0 ? (
             <div className="content-grid">
-              {data.data.data.map((item) => (
-                <ContentCard key={item.externalId} content={item} />
-              ))}
+              {data.data.data.map((item) => {
+                const pref = preferences.find(p => p.externalId === item.externalId && p.contentType === item.contentType)
+                return (
+                  <ContentCard
+                    key={item.externalId}
+                    content={item}
+                    isDisliked={!!pref}
+                    preferenceId={pref?.id}
+                  />
+                )
+              })}
             </div>
           ) : (
             <p>No results found for "{formQuery}". Try a different search.</p>
