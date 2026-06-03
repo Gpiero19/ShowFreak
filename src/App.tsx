@@ -5,6 +5,7 @@ import SearchPage from './pages/SearchPage'
 import DetailsPage from './pages/DetailsPage'
 import LibraryPage from './pages/LibraryPage'
 import AuthPage from './pages/AuthPage'
+import NotFoundPage from './pages/NotFoundPage'
 import Navbar from './components/Navbar'
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
@@ -53,6 +54,7 @@ function App() {
             </PrivateRoute>
           }
         />
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </>
   )

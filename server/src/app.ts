@@ -25,6 +25,10 @@ app.use('/api/library', libraryRoutes)
 app.use('/api/preferences', preferencesRoutes)
 app.use('/api/recommendations', recommendationsRoutes)
 
+app.use((_req: Request, res: Response) => {
+  res.status(404).json({ success: false, error: 'Not found', code: 'NOT_FOUND' })
+})
+
 app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
   console.error('Error:', err)
   res.status(500).json({
