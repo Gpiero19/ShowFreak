@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useLibrary } from '../hooks/useLibrary'
 import { usePreferences } from '../hooks/usePreferences'
 import { LibraryStatus, ContentType, SortField, SortOrder } from '../types'
 import { ContentCard } from '../components/search/ContentCard'
 
 export default function LibraryPage() {
+  const navigate = useNavigate()
   const [activeStatuses, setActiveStatuses] = useState<LibraryStatus[]>([])
   const [activeTypes, setActiveTypes] = useState<ContentType[]>([])
   const [showDislikes, setShowDislikes] = useState(false)
@@ -197,29 +199,39 @@ export default function LibraryPage() {
               gap: '1rem'
             }}>
               {dislikes.map((pref) => (
-                <div 
-                  key={pref.id} 
-                  style={{ 
-                    backgroundColor: '#1f2937', 
-                    padding: '1rem', 
-                    borderRadius: '8px',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '0.5rem',
-                    cursor: 'pointer'
-                  }}
-                  onClick={() => window.location.href = `/details/${pref.externalId}?type=${pref.contentType}`}
+                <div
+                  key={pref.id}
+                  className="content-card"
+                  onClick={() => navigate(`/details/${pref.externalId}?type=${pref.contentType}`)}
                 >
-                  <div style={{ fontWeight: 'bold', fontSize: '0.875rem' }}>
-                    {pref.externalId}
-                  </div>
-                  <div style={{ color: '#9ca3af', fontSize: '0.75rem' }}>
-                    {pref.contentType === 'movie' ? 'Movie' : 'TV Show'}
-                  </div>
-                  {pref.dislikeReason && (
-                    <div style={{ color: '#6b7280', fontSize: '0.75rem' }}>
-                      Reason: {pref.dislikeReason}
+                  {pref.posterPath ? (
+                    <img
+                      src={`https://image.tmdb.org/t/p/w500${pref.posterPath}`}
+                      alt={pref.title ?? pref.externalId}
+                    />
+                  ) : (
+                    <div style={{
+                      backgroundColor: '#374151',
+                      aspectRatio: '2/3',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: '#6b7280',
+                      fontSize: '0.75rem',
+                    }}>
+                      No image
                     </div>
+                  )}
+                  <h3 style={{ marginBottom: '0.125rem' }}>
+                    {pref.title ?? pref.externalId}
+                  </h3>
+                  <p style={{ margin: '0 0 0.125rem 0', color: '#9ca3af' }}>
+                    {pref.releaseYear ?? ''} · {pref.contentType === 'movie' ? 'Movie' : 'TV Show'}
+                  </p>
+                  {pref.dislikeReason && (
+                    <p style={{ margin: 0, color: '#6b7280', fontSize: '0.75rem' }}>
+                      {pref.dislikeReason}
+                    </p>
                   )}
                 </div>
               ))}

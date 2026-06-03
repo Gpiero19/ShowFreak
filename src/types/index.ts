@@ -156,6 +156,9 @@ export interface UserPreference {
   contentType: ContentType;
   dislikeReason: string | null;
   createdAt: Date;
+  title: string | null;
+  posterPath: string | null;
+  releaseYear: number | null;
 }
 
 export interface CreatePreferenceDto {
