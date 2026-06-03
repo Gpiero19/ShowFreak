@@ -81,6 +81,7 @@ model UserPreference {
   createdAt     DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
   user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@unique([userId, externalId, contentType], map: "idx_preferences_unique")
   @@index([userId], map: "idx_preferences_user")
   @@map("user_preferences")
 }
