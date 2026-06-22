@@ -18,26 +18,63 @@
   position: relative;
 }
 
-/* Three-section layout */
+/* Left section */
+.left {
+  display: flex;
+  align-items: center;
+}
+
+/* Desktop nav links */
 .navLinks {
   display: flex;
   align-items: center;
   gap: 2rem;
 }
 
+/* Hamburger — hidden on desktop */
+.hamburger {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  width: 36px;
+  height: 36px;
+}
+
+.bar {
+  display: block;
+  width: 22px;
+  height: 2px;
+  background-color: #e5e7eb;
+  border-radius: 2px;
+  transition: transform 0.25s ease, opacity 0.25s ease;
+}
+
+.bar1Open { transform: translateY(7px) rotate(45deg); }
+.bar2Open { opacity: 0; }
+.bar3Open { transform: translateY(-7px) rotate(-45deg); }
+
+/* Center — logo */
 .logoLink {
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
   align-items: center;
-  padding: 0;
 }
 
-.logoLink:hover {
-  opacity: 0.8;
+.logoLink:hover { opacity: 0.8; }
+
+.logo {
+  height: 120px;
+  width: auto;
 }
 
+/* Nav links */
 .navLink {
   color: #e5e7eb;
   text-decoration: none;
@@ -70,11 +107,11 @@
   border-radius: 1px;
 }
 
-/* User section - right side */
+/* Right — user section */
 .userSection {
   display: flex;
   align-items: center;
-  gap: 1.5rem;
+  gap: 0.75rem;
 }
 
 .username {
@@ -103,33 +140,64 @@
   color: white;
 }
 
-.logo {
-  height: 120px;
-  width: auto;
+/* Mobile dropdown */
+.mobileMenu {
+  display: none;
+  flex-direction: column;
+  background-color: #111827;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  padding: 0.5rem 0;
 }
 
-/* Responsive adjustments */
+.mobileLink {
+  color: #e5e7eb;
+  text-decoration: none;
+  font-size: 1rem;
+  font-weight: 500;
+  padding: 0.875rem 1.5rem;
+  transition: background-color 0.2s;
+}
+
+.mobileLink:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+  color: white;
+}
+
+.mobileLink.active {
+  color: #60a5fa;
+  background-color: rgba(96, 165, 250, 0.1);
+}
+
+/* ── Mobile ──────────────────────────────────────────────── */
 @media (max-width: 768px) {
-  .container {
-    padding: 0 0.75rem;
-    gap: 0.5rem;
+  .navbar {
+    padding: 0 1rem;
+  }
+
+  /* Show hamburger, hide desktop links */
+  .hamburger {
+    display: flex;
+  }
+
+  .navLinks {
+    display: none;
+  }
+
+  /* Show mobile dropdown when menu is open */
+  .mobileMenu {
+    display: flex;
   }
 
   .logo {
     height: 48px;
   }
 
-  .navLinks {
-    gap: 0.25rem;
-  }
-
-  .navLink {
-    font-size: 0.8rem;
-    padding: 0.4rem 0.4rem;
-  }
-
   .username {
-    display: none;
+    font-size: 0.8rem;
+    max-width: 80px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .logoutBtn {
