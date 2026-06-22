@@ -38,7 +38,7 @@ export default function Navbar() {
           <img
             src="/ShowFreak.png"
             alt="ShowFreak"
-            style={{ height: '120px', width: 'auto' }}
+            className={styles.logo}
           />
         </Link>
 
