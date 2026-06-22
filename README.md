@@ -1,157 +1,127 @@
 # ShowFreak
 
-🔗 **[Live Demo](https://show-freak-src.vercel.app)** — try it with `demo@showfreak.com` / `demo1234`
-
 **Full-stack web application for discovering, tracking, and getting personalized recommendations for movies and TV shows.**
 
-ShowFreak helps users build their personal media library, track what they've watched, and receive smart recommendations based on their viewing history and preferences.
+🔗 **[Live Demo](https://show-freak-src.vercel.app)** — log in instantly with `demo@showfreak.com` / `demo1234`
 
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.3-3178C6?logo=typescript)](https://www.typescriptlang.org/)
 [![React](https://img.shields.io/badge/React-18-61DAFB?logo=react)](https://reactjs.org/)
 [![Node.js](https://img.shields.io/badge/Node.js-20+-339933?logo=node.js)](https://nodejs.org/)
 [![Express](https://img.shields.io/badge/Express-4.18-000000?logo=express)](https://expressjs.com/)
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-4169E1?logo=postgresql)](https://www.postgresql.org/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql)](https://www.postgresql.org/)
 [![Prisma](https://img.shields.io/badge/Prisma-5.9-2D3748?logo=prisma)](https://prisma.io/)
 
-## 🚀 Tech Stack
+---
 
-### Frontend
-- **React 18** with Hooks and Context API
-- **TypeScript** with strict type safety
-- **Vite** for fast development and optimized builds
-- **React Router v6** for SPA navigation
-- **TanStack Query** for server state management
-- **Zod** for runtime validation
+![ShowFreak Library](src/public/ShowFreak-Library.png)
 
-### Backend
-- **Node.js 20+** with ES2022 modules
-- **Express.js** RESTful API
-- **TypeScript** with comprehensive type definitions
-- **JWT** authentication with bcrypt password hashing
-- **Zod** for request validation
+---
 
-### Database & Infrastructure
-- **PostgreSQL** with optimized indexing
-- **Prisma ORM** for type-safe database queries
-- **TMDB API** integration with intelligent caching
+## Features
 
-## ✨ Key Features
+- **Smart Search** — Search movies and TV shows via TMDB API with type filtering (movie / TV)
+- **Personal Library** — Track content as watched, favorite, or wishlist with personal ratings (1–5 ★) and notes
+- **Filtering & Sorting** — Filter by status, genre, and content type; sort by rating, release year, or date added
+- **Content-Based Recommendations** — Genre-weighted algorithm surfaces personalized suggestions based on your watch history and ratings
+- **Dislike System** — Mark content you dislike to exclude it from recommendations
+- **JWT Authentication** — Secure register/login with refresh token silent renewal
 
-- 🔍 **Smart Search** - Search movies and TV shows via TMDB API
-- 📚 **Personal Library** - Track watched, favorite, and wishlist items
-- ⭐ **Rating System** - Rate content 1-5 stars and add personal notes
-- 🎯 **Content-Based Recommendations** - Personalized suggestions based on viewing history
-- 🚫 **Dislike Filtering** - Exclude genres you don't enjoy
-- 🏷️ **Genre Filtering** - Filter library by genres with PostgreSQL JSONB queries
-- 📊 **Flexible Sorting** - Sort by rating, release year, or date added
+## Tech Stack
 
-## 📁 Project Structure
+| Layer | Technology |
+|-------|------------|
+| Frontend | React 18, TypeScript, Vite, React Router v6, TanStack Query |
+| Backend | Node.js 20, Express, TypeScript (ESM) |
+| Database | PostgreSQL 16 + Prisma ORM |
+| Auth | JWT + bcrypt, refresh token rotation |
+| External API | TMDB API with local content caching |
+| Logging | Pino structured logging, optional Sentry |
+| Testing | Vitest — 81 backend integration tests, 25 frontend unit tests |
+| Deployment | Vercel (frontend) + Render (backend) + Neon (PostgreSQL) |
+
+## Architecture
 
 ```
-showfreak/
-├── src/                    # Frontend (React + Vite)
-│   ├── components/        # Reusable UI components
-│   ├── pages/            # Route pages (Home, Library, Search, Details, Preferences)
-│   ├── hooks/            # Custom React hooks
-│   ├── services/         # API client functions
-│   ├── context/          # React Context providers
-│   └── types/            # TypeScript interfaces
-├── server/                 # Backend (Node.js + Express)
-│   ├── routes/           # API endpoint definitions
-│   ├── controllers/      # Request handlers
-│   ├── services/         # Business logic
-│   ├── middleware/       # Auth, validation, error handling
-│   └── prisma/           # Database schema and migrations
+src/                          # Frontend — React + Vite
+├── pages/                    # Home, Search, Details, Library, Auth
+├── components/               # Navbar, ContentCard, ErrorBoundary
+├── hooks/                    # useLibrary, useRecommendations, usePreferences...
+├── services/api.ts           # Axios instance + JWT interceptors
+└── context/AuthContext.tsx   # Auth state + token management
+
+server/                       # Backend — Node.js + Express
+├── src/
+│   ├── routes/               # Auth, content, library, preferences, recommendations
+│   ├── controllers/          # Thin request handlers
+│   ├── services/             # Business logic (auth, tmdb, library, recommendations)
+│   ├── middleware/           # JWT auth, rate limiting, Helmet, CORS
+│   └── lib/                  # Prisma singleton, TMDB singleton, pino logger
+└── prisma/schema.prisma
 ```
 
-## 🛠️ Getting Started
+**Key design decisions:**
+- All TMDB metadata is cached in `content_cache` on first fetch — library queries never hit the external API
+- Library filtering and sorting use a single JOIN query against the local cache (no N+1 queries)
+- Recommendation engine weights genres from rated content (5★=3pts, 4★=2pts, 3★=1pt) and queries TMDB discover
+
+## API
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/auth/register` | Register new user |
+| POST | `/api/auth/login` | Login, returns JWT + refresh token |
+| GET | `/api/auth/me` | Current user |
+| GET | `/api/content/search` | Search TMDB (`?q=&type=movie\|tv`) |
+| GET | `/api/content/:id` | Content details |
+| GET | `/api/content/:id/similar` | Similar content |
+| GET | `/api/library` | User library (`?status&genre&type&sort&q`) |
+| POST | `/api/library` | Add to library |
+| PATCH | `/api/library/:id` | Update rating, status, notes |
+| DELETE | `/api/library/:id` | Remove from library |
+| GET | `/api/preferences` | User dislikes |
+| POST | `/api/preferences` | Add dislike |
+| DELETE | `/api/preferences/:id` | Remove dislike |
+| GET | `/api/recommendations` | Personalized recommendations |
+
+## Getting Started
 
 ### Prerequisites
+
 - Node.js 20+
-- PostgreSQL 15+
-- TMDB API key
+- PostgreSQL 16+
+- TMDB API key (free at [themoviedb.org](https://www.themoviedb.org/settings/api))
 
 ### Installation
 
 ```bash
-# Clone the repository
-git clone https://github.com/yourusername/showfreak.git
+git clone https://github.com/Gpiero19/ShowFreak.git
 cd showfreak
-
-# Install dependencies
 npm install
 
-# Setup environment variables
+# Configure environment
 cp server/.env.example server/.env
-# Edit server/.env with your database URL and TMDB API key
+# Fill in DATABASE_URL, JWT_SECRET, and TMDB_API_KEY in server/.env
 
 # Run database migrations
-cd server
-npm run db:push
+cd server && npx prisma migrate deploy
 
-# Start development servers
-npm run dev
+# Seed demo data (optional)
+npx prisma db seed
+
+# Start both servers
+cd .. && npm run dev
 ```
 
-### Available Scripts
+### Scripts
 
 ```bash
-npm run dev           # Start both frontend and backend
-npm run dev:frontend  # Start frontend only (localhost:5173)
-npm run dev:backend   # Start backend only (localhost:3001)
-npm run build         # Build both frontend and backend
-npm run lint          # Run ESLint
-npm run typecheck     # Run TypeScript compiler check
+npm run dev             # Start frontend (:5173) + backend (:3001)
+npm run build           # Build both workspaces
+npm run test            # Run all tests
+npm run typecheck       # TypeScript check across both workspaces
+npm run lint            # ESLint across both workspaces
 ```
 
-## 🔌 API Endpoints
+## License
 
-### Authentication
-- `POST /api/auth/register` - User registration
-- `POST /api/auth/login` - User login
-- `GET /api/auth/me` - Get current user
-
-### Content
-- `GET /api/content/search` - Search TMDB for movies/TV shows
-- `GET /api/content/:id` - Get content details
-- `GET /api/content/:id/similar` - Get similar content
-
-### Library
-- `GET /api/library` - Get user's library (with filtering/sorting)
-- `POST /api/library` - Add item to library
-- `PATCH /api/library/:id` - Update library item
-- `DELETE /api/library/:id` - Remove from library
-
-### Recommendations
-- `GET /api/recommendations` - Get personalized recommendations
-
-## 🎯 Architecture Highlights
-
-- **Modular Design** - Clean separation of concerns (Controllers → Services → Database)
-- **Type Safety** - End-to-end TypeScript with no `any` types
-- **Optimized Queries** - All library operations use JOINs with cached data (no N+1 queries)
-- **JWT Auth** - Secure authentication with bcrypt password hashing
-- **Content Caching** - TMDB data cached locally to minimize external API calls
-
-## 📊 Database Schema
-
-The application uses a well-normalized PostgreSQL schema with:
-- `users` - User accounts with secure password storage
-- `content_cache` - Cached TMDB metadata with genre indexing
-- `library_items` - User's personal library with status tracking
-- `user_preferences` - Disliked content for recommendation filtering
-
-## 🧪 Testing
-
-```bash
-# Run tests (when implemented)
-npm run test
-```
-
-## 📄 License
-
-MIT License - see [LICENSE](LICENSE) file for details.
-
----
-
-**ShowFreak** - Your personal guide to the world of movies and TV shows.
+MIT License — see [LICENSE](LICENSE) for details.
