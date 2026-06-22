@@ -14,6 +14,7 @@ import { useLibraryItem } from '../hooks/useLibraryItem'
 import { usePreferences } from '../hooks/usePreferences'
 
 export default function DetailsPage() {
+  useEffect(() => { document.title = 'ShowFreak — Details' }, [])
   const { id } = useParams()
   const [searchParams] = useSearchParams()
   const type = searchParams.get('type') as 'movie' | 'tv' || 'movie'

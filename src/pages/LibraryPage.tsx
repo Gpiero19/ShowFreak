@@ -6,6 +6,7 @@ import { LibraryStatus, ContentType, SortField, SortOrder } from '../types'
 import { ContentCard } from '../components/search/ContentCard'
 
 export default function LibraryPage() {
+  useEffect(() => { document.title = 'ShowFreak — Library' }, [])
   const navigate = useNavigate()
   const [activeStatuses, setActiveStatuses] = useState<LibraryStatus[]>([])
   const [activeTypes, setActiveTypes] = useState<ContentType[]>([])

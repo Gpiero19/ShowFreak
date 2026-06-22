@@ -1,5 +1,7 @@
 # ShowFreak
 
+🔗 **[Live Demo](https://show-freak-src.vercel.app)** — try it with `demo@showfreak.com` / `demo1234`
+
 **Full-stack web application for discovering, tracking, and getting personalized recommendations for movies and TV shows.**
 
 ShowFreak helps users build their personal media library, track what they've watched, and receive smart recommendations based on their viewing history and preferences.

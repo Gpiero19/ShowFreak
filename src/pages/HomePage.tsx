@@ -5,6 +5,7 @@ import { ContentCard } from '../components/search/ContentCard'
 import { ContentType } from '../types'
 
 export default function HomePage() {
+  useEffect(() => { document.title = 'ShowFreak — Home' }, [])
   const [activeType, setActiveType] = useState<ContentType | ''>('')
   const { preferences } = usePreferences()
   

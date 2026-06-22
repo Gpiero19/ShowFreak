@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import api from '../services/api'
@@ -11,6 +11,7 @@ interface SearchResponseData {
 }
 
 export default function SearchPage() {
+  useEffect(() => { document.title = 'ShowFreak — Search' }, [])
   const [query, setQuery] = useState('')
   const [searchParams] = useSearchParams()
   const navigate = useNavigate()
