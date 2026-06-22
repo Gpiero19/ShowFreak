@@ -40,8 +40,49 @@ export default function AuthPage() {
     }
   }
 
+  const fillDemo = () => {
+    setEmail('demo@showfreak.com')
+    setPassword('demo1234')
+    setIsLogin(true)
+  }
+
   return (
     <div className="auth-page" style={{ maxWidth: '400px', margin: '0 auto', padding: '20px' }}>
+
+      {isLogin && (
+        <div style={{
+          backgroundColor: '#1e3a5f',
+          border: '1px solid #3b82f6',
+          borderRadius: '8px',
+          padding: '14px 18px',
+          marginBottom: '24px',
+          fontSize: '0.875rem',
+          color: '#93c5fd',
+          lineHeight: '1.6',
+        }}>
+          <strong style={{ color: '#60a5fa', display: 'block', marginBottom: '6px' }}>Demo account</strong>
+          <span>Email: <code style={{ color: 'white' }}>demo@showfreak.com</code></span><br />
+          <span>Password: <code style={{ color: 'white' }}>demo1234</code></span><br />
+          <button
+            type="button"
+            onClick={fillDemo}
+            style={{
+              marginTop: '10px',
+              padding: '6px 14px',
+              backgroundColor: '#3b82f6',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              fontSize: '0.8rem',
+              fontWeight: 'bold',
+            }}
+          >
+            Fill credentials
+          </button>
+        </div>
+      )}
+
       {message && (
         <div
           style={{
