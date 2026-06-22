@@ -20,25 +20,25 @@ const content = [
   },
   {
     externalId: '27205', contentType: 'movie',
-    title: 'Inception', posterPath: '/oYuLEt3zVCKq57qu2F8dT7NIa6f.jpg',
+    title: 'Inception', posterPath: '/xlaY2zyzMfkhk0HSC5VUwzoZPU1.jpg',
     voteAverage: 8.8, releaseYear: 2010, genres: [28, 878, 12],
     overview: 'A thief who steals corporate secrets through the use of dream-sharing technology is given the inverse task of planting an idea into the mind of a C.E.O.',
   },
   {
     externalId: '157336', contentType: 'movie',
-    title: 'Interstellar', posterPath: '/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg',
+    title: 'Interstellar', posterPath: '/yQvGrMoipbRoddT0ZR8tPoR7NfX.jpg',
     voteAverage: 8.7, releaseYear: 2014, genres: [12, 18, 878],
     overview: 'A team of explorers travel through a wormhole in space in an attempt to ensure humanity\'s survival.',
   },
   {
     externalId: '278', contentType: 'movie',
-    title: 'The Shawshank Redemption', posterPath: '/lyQBXzOQSuE59IsHyhrp0qIiPAz.jpg',
+    title: 'The Shawshank Redemption', posterPath: '/9cqNxx0GxF0bflZmeSMuL5tnGzr.jpg',
     voteAverage: 8.7, releaseYear: 1994, genres: [18, 80],
     overview: 'Two imprisoned men bond over a number of years, finding solace and eventual redemption through acts of common decency.',
   },
   {
     externalId: '238', contentType: 'movie',
-    title: 'The Godfather', posterPath: '/3bhkrj58Vtu7enYsLFmd7rVkTRi.jpg',
+    title: 'The Godfather', posterPath: '/3bhkrj58Vtu7enYsRolD1fZdja1.jpg',
     voteAverage: 8.7, releaseYear: 1972, genres: [18, 80],
     overview: 'Spanning the years 1945 to 1955, a chronicle of the fictional Italian-American Corleone crime family.',
   },
@@ -50,25 +50,25 @@ const content = [
   },
   {
     externalId: '550', contentType: 'movie',
-    title: 'Fight Club', posterPath: '/pB8BM7pdSp6B6Ih7QZ4DrQ3PmJK.jpg',
+    title: 'Fight Club', posterPath: '/jSziioSwPVrOy9Yow3XhWIBDjq1.jpg',
     voteAverage: 8.4, releaseYear: 1999, genres: [18, 53],
     overview: 'A ticking-time-bomb insomniac and a slippery soap salesman channel primal male aggression into a shocking new form of therapy.',
   },
   {
     externalId: '603', contentType: 'movie',
-    title: 'The Matrix', posterPath: '/f89U3ADr1oiB1s9GkdPOEpXUk5H.jpg',
+    title: 'The Matrix', posterPath: '/dXNAPwY7VrqMAo51EKhhCJfaGb5.jpg',
     voteAverage: 8.2, releaseYear: 1999, genres: [28, 878],
     overview: 'A computer hacker learns from mysterious rebels about the true nature of his reality and his role in the war against its controllers.',
   },
   {
     externalId: '438631', contentType: 'movie',
-    title: 'Dune', posterPath: '/d5NXSklXo0qyIYkgV94XAgMIckC.jpg',
+    title: 'Dune', posterPath: '/gDzOcq0pfeCeqMBwKIJlSmQpjkZ.jpg',
     voteAverage: 7.8, releaseYear: 2021, genres: [878, 12],
     overview: 'Paul Atreides, a brilliant and gifted young man born into a great destiny beyond his understanding, must travel to the most dangerous planet in the universe to ensure the future of his family and his people.',
   },
   {
     externalId: '872585', contentType: 'movie',
-    title: 'Oppenheimer', posterPath: '/8Gxv8giaFIgKDxPa3WA0ubFOSGz.jpg',
+    title: 'Oppenheimer', posterPath: '/8Gxv8gSFCU0XGDykEGv7zR1n2ua.jpg',
     voteAverage: 8.2, releaseYear: 2023, genres: [18, 36],
     overview: 'The story of J. Robert Oppenheimer\'s role in the development of the atomic bomb during World War II.',
   },
@@ -81,7 +81,7 @@ const content = [
   // ── TV Shows ────────────────────────────────────────────────────────────────
   {
     externalId: '1396', contentType: 'tv',
-    title: 'Breaking Bad', posterPath: '/ggFHVNu6YYI5L9pCfOacjizRGt.jpg',
+    title: 'Breaking Bad', posterPath: '/ztkUQFLlC19CCMYHW9o1zWhJRNq.jpg',
     voteAverage: 9.5, releaseYear: 2008, genres: [18, 80],
     overview: 'A high school chemistry teacher diagnosed with inoperable lung cancer turns to manufacturing and selling methamphetamine in order to secure his family\'s future.',
   },
@@ -93,26 +93,26 @@ const content = [
   },
   {
     externalId: '1399', contentType: 'tv',
-    title: 'Game of Thrones', posterPath: '/u3bZgnGQ9T01sWNhyveQz0wH0Hl.jpg',
+    title: 'Game of Thrones', posterPath: '/1XS1oqL89opfnbLl8WnZY1O1uJx.jpg',
     voteAverage: 8.4, releaseYear: 2011, genres: [18, 10765],
     overview: 'Seven noble families fight for control of the mythical land of Westeros. Friction between the houses leads to full-scale war. All while a very ancient evil awakens in the farthest north.',
   },
   {
     externalId: '37854', contentType: 'tv',
-    title: 'Succession', posterPath: '/e2X8xXi9jcSiIKeCfCdkQvW5fVa.jpg',
+    title: 'Succession', posterPath: '/dB4EDhre2dsC2kxYDavyKWqLQwi.jpg',
     voteAverage: 8.6, releaseYear: 2018, genres: [18, 35],
     overview: 'The Roy family is known for controlling the biggest media and entertainment company in the world. However, their world changes when their father steps down from the company.',
   },
   // ── Disliked content ────────────────────────────────────────────────────────
   {
     externalId: '1858', contentType: 'movie',
-    title: 'Transformers', posterPath: '/7ZULqSmjPkr5I7MmMjU9Naf5Vs0.jpg',
+    title: 'Transformers', posterPath: '/4N4sipl8T72tNE4earcctQa2Kw2.jpg',
     voteAverage: 6.9, releaseYear: 2007, genres: [28, 12, 878],
     overview: 'An ancient struggle between two Cybertronian races, the heroic Autobots and the evil Decepticons, comes to Earth.',
   },
   {
     externalId: '408409', contentType: 'movie',
-    title: 'The Emoji Movie', posterPath: '/hJH3MVBkJiMWKS3qFSFJAXPH9Vk.jpg',
+    title: 'The Emoji Movie', posterPath: '/7gLQ30xSVUy6ASfv0pOuQaoE7jD.jpg',
     voteAverage: 3.4, releaseYear: 2017, genres: [16, 35, 10751],
     overview: 'Gene, a multi-expressional emoji, sets out on a journey to become a normal emoji.',
   },
@@ -158,7 +158,7 @@ async function main() {
   for (const item of content) {
     await prisma.contentCache.upsert({
       where: { externalId_contentType: { externalId: item.externalId, contentType: item.contentType } },
-      update: {},
+      update: { posterPath: item.posterPath, expiresAt: FAR_FUTURE },
       create: {
         externalId: item.externalId,
         contentType: item.contentType,

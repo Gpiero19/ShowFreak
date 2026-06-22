@@ -54,7 +54,6 @@ export default function Navbar() {
           <Link to="/" className={`${styles.mobileLink} ${isActive('/') ? styles.active : ''}`} onClick={closeMenu}>Home</Link>
           <Link to="/search" className={`${styles.mobileLink} ${isActive('/search') ? styles.active : ''}`} onClick={closeMenu}>Search</Link>
           <Link to="/library" className={`${styles.mobileLink} ${isActive('/library') ? styles.active : ''}`} onClick={closeMenu}>Library</Link>
-          <Link to="/preferences" className={`${styles.mobileLink} ${isActive('/preferences') ? styles.active : ''}`} onClick={closeMenu}>Preferences</Link>
         </div>
       )}
     </nav>
