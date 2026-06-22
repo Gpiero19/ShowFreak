@@ -6,7 +6,7 @@ interface TMDBConfig {
   imageBaseURL: string
 }
 
-class TMDBService {
+export class TMDBService {
   public client: AxiosInstance
   private imageBaseURL: string
 
