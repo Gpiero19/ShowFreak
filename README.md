@@ -2,7 +2,7 @@
 
 **Full-stack web application for discovering, tracking, and getting personalized recommendations for movies and TV shows.**
 
-🔗 **[Live Demo](https://show-freak-src.vercel.app)** — log in instantly with `demo@showfreak.com` / `demo1234`
+🔗 **[Live Demo](https://showfreak.canevarigian.dev)** — log in instantly with `demo@showfreak.com` / `demo1234`
 
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.3-3178C6?logo=typescript)](https://www.typescriptlang.org/)
 [![React](https://img.shields.io/badge/React-18-61DAFB?logo=react)](https://reactjs.org/)
