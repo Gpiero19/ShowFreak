@@ -110,7 +110,7 @@ export default function AuthPage() {
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             required
-            style={{ padding: '12px', border: '1px solid #ccc', borderRadius: '4px' }}
+            style={{ padding: '12px', border: '1px solid #ccc', borderRadius: '4px', width: '100%', boxSizing: 'border-box' }}
           />
         )}
         <input
@@ -119,7 +119,7 @@ export default function AuthPage() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
-          style={{ padding: '12px', border: '1px solid #ccc', borderRadius: '4px' }}
+          style={{ padding: '12px', border: '1px solid #ccc', borderRadius: '4px', width: '100%', boxSizing: 'border-box' }}
         />
         <div>
           <input
